@@ -63,9 +63,6 @@ public class BinarizeViewController {
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov,
                 Number old_val, Number new_val) {
-                    /*cappuccino.setScaleX(new_val.doubleValue());
-                    cappuccino.setScaleY(new_val.doubleValue());
-                    scalingValue.setText(String.format("%.2f", new_val));*/
             	processImage();
             }
         });
