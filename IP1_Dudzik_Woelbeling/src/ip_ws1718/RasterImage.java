@@ -18,6 +18,9 @@ import javafx.scene.image.WritableImage;
 public class RasterImage {
 	
 	private static final int gray  = 0xffa0a0a0;
+	private static final int white = 0xffffffff;
+	private static final int black = 0xff000000;
+	private static final int mask = 0xff;
 
 	public int[] argb;	// pixels represented as ARGB values in scanline order
 	public int width;	// image width in pixels
@@ -80,8 +83,15 @@ public class RasterImage {
 	// image point operations to be added here
 	
 	public void binarizeWithThreshold(int threshold) {
-		// TODO: binarize the image with the given threshold
-		Arrays.fill(argb, gray);
+		// binarize the image with the given threshold
+		for (int i = 0; i < argb.length; i++) {
+			int red = (argb[i] >> 16) & mask;
+			int green = (argb[i] >> 8) & mask;
+			int blue = argb[i] & mask;
+			int gray = (red + green + blue) / 3;
+			
+			argb[i] = (gray <= threshold) ? black : white;	// black is foreground
+		}
 	}
 	
 	/**
