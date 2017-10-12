@@ -85,11 +85,7 @@ public class RasterImage {
 	public void binarizeWithThreshold(int threshold) {
 		// binarize the image with the given threshold
 		for (int i = 0; i < argb.length; i++) {
-			int red = (argb[i] >> 16) & mask;
-			int green = (argb[i] >> 8) & mask;
-			int blue = argb[i] & mask;
-			int gray = (red + green + blue) / 3;
-			
+			int gray =  getGrayValue(argb[i]);
 			argb[i] = (gray <= threshold) ? black : white;	// black is foreground
 		}
 	}
@@ -99,10 +95,95 @@ public class RasterImage {
 	 * @return the threshold computed by iso-data
 	 */
 	public int binarizeWithIsoData() {
-		int threshold = 0;
-		// TODO: binarize the image using the iso-data algorithm
-		Arrays.fill(argb, gray);
-		return threshold; // TODO: return the computed threshold
+		int threshold = findThresholdIsodata();
+		binarizeWithThreshold(threshold);
+		return threshold;
+	}
+	
+	/**
+	 * the ISODATA algorithm
+	 * @return computed threshold
+	 */
+	private int findThresholdIsodata(){
+		int start = 128;	// start value
+		int t, tLower, tHigher;
+		
+		int[] hist = getHistogram(this.argb);
+		
+		do {
+			t = start;
+			tLower = tHigher = 0;
+			int sumLower = 0, sumHigher = 0;
+			
+			if (start == 0 || start == 255)		// in case whole image is black or white -> no 2 parts
+				break;
+			
+			// first find medium gray in lower part
+			for (int a = 0; a < t; a++) {
+				tLower += (hist[a]*a);
+				sumLower += hist[a];
+			}
+			if (sumLower > 0) {
+				tLower /= sumLower;
+			} else {
+				// lower part is empty -> try higher threshold
+				start += (hist.length - t) / 2;
+				continue;
+			}
+			
+			// second, find medium gray in upper part
+			for (int a = t; a < hist.length; a++) {
+				tHigher += (hist[a]*a);
+				sumHigher += hist[a];
+			}
+			if (sumHigher > 0) {
+				tHigher /= sumHigher;
+			} else {
+				// upper part is empty -> try lower threshold
+				//if (start > 0)
+					start /= 2;
+				continue;
+			}
+			
+			// adjust threshold
+			start = (tLower + tHigher)/2;
+			
+		} while (start != t);	// no new threshold: break!
+		
+		return t;
+	}
+	
+	/**
+	 * compute histogram
+	 * @param img the image array (pixels represented as ARGB values in scanline order)
+	 * @return the histogram array (slots 0 - 255)
+	 */
+	
+	private int[] getHistogram(int[] img) {
+		// return a graylevel histogram
+		int[] hist = new int[256];
+		
+		for (int i = 0; i < img.length; i++) {
+			int gray = getGrayValue(img[i]);
+			hist[gray]++;
+		}
+		return hist;
+	}
+	
+	/**
+	 * helper: do all the shifting and masking to get red, green and blue and compute luminosity by adding these and dividing by 3
+	 * @param color	pixel value as int
+	 * @return gray level 0 - 255
+	 */
+	
+	private int getGrayValue(int color) {
+		// return luminosity (gray value)
+		int red = (color >> 16) & mask;
+		int green = (color >> 8) & mask;
+		int blue = color & mask;
+		int lum = (red + green + blue) / 3;
+		
+		return lum;
 	}
 
 }
