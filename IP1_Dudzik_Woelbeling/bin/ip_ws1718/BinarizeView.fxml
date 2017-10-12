@@ -14,6 +14,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -21,7 +22,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane maxHeight="800.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ip_ws1718.BinarizeViewController">
+<BorderPane maxHeight="800.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ip_ws1718.BinarizeViewController">
    <center>
       <GridPane hgap="5.0" vgap="5.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
@@ -79,4 +80,7 @@
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
+   <right>
+      <Slider fx:id="slider" max="255.0" orientation="VERTICAL" value="128.0" BorderPane.alignment="CENTER" />
+   </right>
 </BorderPane>

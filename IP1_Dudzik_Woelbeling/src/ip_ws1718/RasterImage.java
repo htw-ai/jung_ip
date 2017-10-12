@@ -1,8 +1,6 @@
-// IP Ue1 WS2017/18 Vorgabe
+// IP Ue1 WS2017/18
 //
-// Copyright (C) 2017 by Klaus Jung
-// All rights reserved.
-// Date: 2017-08-18
+// Date: 2017-10-12
 
 package ip_ws1718;
 
