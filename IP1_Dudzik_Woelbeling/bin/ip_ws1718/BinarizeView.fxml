@@ -23,7 +23,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <BorderPane maxHeight="800.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ip_ws1718.BinarizeViewController">
-   <center>
+   <bottom>
+      <Label fx:id="messageLabel" text="Message Label" BorderPane.alignment="CENTER" />
+   </bottom>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+   <left>
       <GridPane hgap="5.0" vgap="5.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="10.0" />
@@ -73,14 +79,22 @@
             </GridPane>
          </children>
       </GridPane>
+   </left>
+   <center>
+      <GridPane prefHeight="266.0" prefWidth="43.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="39.599981689453124" minHeight="10.0" prefHeight="16.399999046325682" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="223.20001525878905" minHeight="10.0" prefHeight="217.60003967285155" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="31.600012207031256" minHeight="0.0" prefHeight="8.599960327148438" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Slider fx:id="slider" max="255.0" minHeight="-Infinity" orientation="VERTICAL" prefHeight="94.0" prefWidth="14.0" value="128.0" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            <Label text="255" GridPane.halignment="CENTER" GridPane.valignment="TOP" />
+            <Label text="0" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
+         </children>
+      </GridPane>
    </center>
-   <bottom>
-      <Label fx:id="messageLabel" text="Message Label" BorderPane.alignment="CENTER" />
-   </bottom>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <right>
-      <Slider fx:id="slider" max="255.0" orientation="VERTICAL" value="128.0" BorderPane.alignment="CENTER" />
-   </right>
 </BorderPane>
