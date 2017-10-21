@@ -157,7 +157,7 @@ public class RasterImage {
 	 * @return the histogram array (slots 0 - 255)
 	 */
 	
-	private int[] getHistogram(int[] img) {
+	private static int[] getHistogram(int[] img) {
 		// return a graylevel histogram
 		int[] hist = new int[256];
 		
@@ -174,7 +174,7 @@ public class RasterImage {
 	 * @return gray level 0 - 255
 	 */
 	
-	private int getGrayValue(int color) {
+	private static int getGrayValue(int color) {
 		// return luminosity (gray value)
 		int red = (color >> 16) & mask;
 		int green = (color >> 8) & mask;
