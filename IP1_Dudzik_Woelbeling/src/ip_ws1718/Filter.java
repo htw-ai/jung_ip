@@ -1,34 +1,33 @@
-// IP Ue1 WS2017/18 Vorgabe
+// IP Ue1 WS2017/18
 //
-// Copyright (C) 2017 by Klaus Jung
-// All rights reserved.
-// Date: 2017-08-18
+// Date: 2017-10-21
 
 package ip_ws1718;
 
-import java.util.Arrays;
-
 public class Filter {
 	
+	/**
+	 * Extract edges with morphologic filters.
+	 * Erode image -> invert result -> intersect result with original image
+	 * @param src source image
+	 * @param dst destination image (will be overwritten)
+	 */
 	public static void outline(RasterImage src, RasterImage dst) {
-		// TODO: implement outline filter
-		//invert(src, dst);
-		//dilate(src, dst);
 		erode(src, dst);
+		invert(dst);
+		intersect(src, dst);
 	}
 	
 	/**
 	 * invert each pixel (works for color & b/w images)
-	 * @param src source image
-	 * @param dst destination image
+	 * @param img source image
 	 */
-	public static void invert(RasterImage src, RasterImage dst) {
-		checkDimen(dst, dst);
+	public static void invert(RasterImage img) {
 		int mask = 0xff;
 		
-		for (int a = 0; a < src.argb.length; a++) {
+		for (int a = 0; a < img.argb.length; a++) {
 			// get color
-			int color = src.argb[a];
+			int color = img.argb[a];
 			int red = (color >> 16) & mask;
 			int green = (color >> 8) & mask;
 			int blue = color & mask;
@@ -37,13 +36,20 @@ public class Filter {
 			green = 255 - green;
 			blue = 255 - blue;
 			//write
-			dst.argb[a] = (mask << 24) | (red << 16) | (green << 8) | blue;
+			img.argb[a] = (mask << 24) | (red << 16) | (green << 8) | blue;
 		}
 	}
 	
-	// fest verdrahtetes Strukturelement
-	// erode und dilate sind vertauscht, weil Vorder- und Hintergrund vertauscht sind!
+	/**
+	 * Morphologic filter: Erosion (with 4N SE).
+	 * If foreground and background are switched, the operations have to be switched, too!
+	 * In this case, the foreground is black (switched), so the logic is that of dilation in slides.
+	 * @param src source image
+	 * @param dst destination image (will be overwritten)
+	 */
 	public static void erode(RasterImage src, RasterImage dst) {
+		// fest verdrahtetes Strukturelement
+		// erode und dilate sind vertauscht, weil Vorder- und Hintergrund vertauscht sind!
 		int index, ind, valr, valg, valb;
 		checkDimen(dst, dst);
 		
@@ -52,10 +58,10 @@ public class Filter {
 			for (int w = 0; w < src.width; w++) {
 				
 				ind = index = h * src.width + w;
-				// TODO: Rand!
 				valr = valg = valb = 0;	// set to minimum value i.o. to later find maximum!
 
 				// structured element with 4-neighbourhood: find maximum at 5 different positions
+				// border handling: border pixels are ignored
 				for (int i = 0; i < 5; i++) {
 					switch (i){
 					case 0:	// north
@@ -85,23 +91,59 @@ public class Filter {
 		}
 	}
 	
-	// Dilatation = Inversion der Erosion des invertierten Bildes
+		/**
+		 * Morphologic filter: Dilation (with 4N SE).
+		 * Dilation = Erosion of inverted picture plus Inversion
+		 * @param src source image
+		 * @param dst destination image (will be overwritten)
+		 */
 		public static void dilate(RasterImage src, RasterImage dst) {
-			RasterImage inv = new RasterImage(src.width, src.height);
-			invert(src, inv);
-			
-			RasterImage erd = new RasterImage(src.width, src.height);
-			erode(inv, erd);
-			
-			invert(erd, dst);
+			// Dilatation = Inversion der Erosion des invertierten Bildes
+			RasterImage inv = new RasterImage(src);
+			invert(inv);
+			erode(inv, dst);
+			invert(dst);
 		}
 	
+	/**
+	 * calculate intersection of 2 images
+	 * @param src source image (first image of intersection)
+	 * @param dst 2nd image of intersection which will receive the result
+	 */
+	public static void intersect(RasterImage src, RasterImage dst) {
+		checkDimen(src, dst);
+		
+		int bg = 0xffffffff;
+		
+		for (int a = 0; a < src.argb.length; a++) {
+			if (src.argb[a] == dst.argb[a]) {
+				dst.argb[a] = src.argb[a];
+			} else {
+				dst.argb[a] = bg;
+			}
+		}
+	}
+		
+	/* HELPERS */
+	
+	/**
+	 * check if dimensions of 2 images match 
+	 * @throws ArrayIndexOutOfBoundsException if dimensions do not match
+	 * @param src 1st image
+	 * @param dst 2nd image
+	 */
 	private static void checkDimen (RasterImage src, RasterImage dst) {
 		if ((src.height != dst.height) || (src.width != dst.width) ) 
 			throw new ArrayIndexOutOfBoundsException("Source and destination image do not match!");
 
 	}
 	
+	/**
+	 * get maximum of 2 numbers
+	 * @param a first number
+	 * @param b second number
+	 * @return maximum
+	 */
 	private static int max(int a, int b) {
 		if (a >= b) {
 			return a;
@@ -110,6 +152,12 @@ public class Filter {
 		}
 	}
 	
+	/**
+	 * get minimum of 2 numbers
+	 * @param a first number
+	 * @param b second number
+	 * @return minimum
+	 */
 	private static int min(int a, int b) {
 		if (a <= b) {
 			return a;
@@ -118,6 +166,13 @@ public class Filter {
 		}
 	}
 	
+	/**
+	 * calculate pixel value and do all the clamping
+	 * @param r RED value
+	 * @param g GREEN value
+	 * @param b BLUE value
+	 * @return pixel value
+	 */
 	private static int calcPixel(int r, int g, int b) {
 		if (r < 0) r = 0;
 		if (g < 0) g = 0;
