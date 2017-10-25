@@ -20,16 +20,17 @@ import javafx.stage.FileChooser;
 public class BinarizeViewController {
 	
 	public enum MethodeType { 
-		COPY("Copy Image"), 
-		THRESHOLD("Threshold"), 
-		ISODATA("ISO Data");
+		COPY("Copy"),
+		DEPTH("Depth First"), 
+		BREADTH("Breadth First"), 
+		SEQUENTIAL("Sequential");
 		
 		private final String name;       
 	    private MethodeType(String s) { name = s; }
 	    public String toString() { return this.name; }
 	};
 
-	private static final String initialFileName = "tools1.png";
+	private static final String initialFileName = "tools.png";
 	private static File fileOpenPath = new File(".");
 
     @FXML
@@ -40,12 +41,6 @@ public class BinarizeViewController {
 
     @FXML
     private ComboBox<MethodeType> methodeSelection;
-    
-    @FXML
-    private CheckBox outline;
-    
-    @FXML
-	private Slider slider;
 
     @FXML
     private Label messageLabel;
@@ -58,14 +53,6 @@ public class BinarizeViewController {
 		
 		// initialize parameters
 		methodeChanged();
-		
-		// set slider
-		slider.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                Number old_val, Number new_val) {
-            	processImage();
-            }
-        });
 		
 		// load and process default image
 		new RasterImage(new File(initialFileName)).setToView(originalImageView);
@@ -88,15 +75,11 @@ public class BinarizeViewController {
     
     @FXML
     void methodeChanged() {
-    	outline.setDisable(methodeSelection.getValue() == MethodeType.COPY);
+    	//outline.setDisable(methodeSelection.getValue() == MethodeType.COPY);
     	processImage();
     }
 
 	
-    @FXML
-    void outlineChanged() {
-    	processImage();
-    }
 	private void processImage() {
 		if(originalImageView.getImage() == null)
 			return; // no image: nothing to do
@@ -106,26 +89,31 @@ public class BinarizeViewController {
 		RasterImage origImg = new RasterImage(originalImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
 		
-		int threshold = (int)slider.getValue();
+		int threshold = 128;
 		
 		switch(methodeSelection.getValue()) {
-		case THRESHOLD:
-			binImg.binarizeWithThreshold(threshold);
+		case DEPTH:
+			//TODO
 			break;
-		case ISODATA:
-			threshold = binImg.binarizeWithIsoData();
+		case BREADTH:
+			// TODO
+			break;
+		case SEQUENTIAL:
+			//TODO
 			break;
 		default:
 			break;
 		}
 		
+		/*
 		if(outline.isSelected() && methodeSelection.getValue() != MethodeType.COPY) {
 			RasterImage outlineImg = new RasterImage(binImg.width, binImg.height);
 			Filter.outline(binImg, outlineImg);
 			outlineImg.setToView(binarizedImageView);			
 		} else {
 			binImg.setToView(binarizedImageView);
-		}
+		}*/
+		binImg.setToView(binarizedImageView);
 		
 	   	messageLabel.setText("Processing time: " + (System.currentTimeMillis() - startTime) + " ms, threshold = " + threshold);
 	}

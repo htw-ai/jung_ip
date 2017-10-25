@@ -10,11 +10,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -74,27 +72,9 @@
                <children>
                   <Label text="Method:" />
                   <ComboBox fx:id="methodeSelection" onAction="#methodeChanged" GridPane.columnIndex="1" />
-                  <CheckBox fx:id="outline" mnemonicParsing="false" onAction="#outlineChanged" text="Outline" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
                </children>
             </GridPane>
          </children>
       </GridPane>
    </left>
-   <center>
-      <GridPane prefHeight="266.0" prefWidth="43.0" BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints maxHeight="39.599981689453124" minHeight="10.0" prefHeight="16.399999046325682" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="223.20001525878905" minHeight="10.0" prefHeight="217.60003967285155" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="31.600012207031256" minHeight="0.0" prefHeight="8.599960327148438" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Slider fx:id="slider" max="255.0" minHeight="-Infinity" orientation="VERTICAL" prefHeight="94.0" prefWidth="14.0" value="128.0" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <Label text="255" GridPane.halignment="CENTER" GridPane.valignment="TOP" />
-            <Label text="0" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
-         </children>
-      </GridPane>
-   </center>
 </BorderPane>
