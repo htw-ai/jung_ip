@@ -75,7 +75,6 @@ public class BinarizeViewController {
     
     @FXML
     void methodeChanged() {
-    	//outline.setDisable(methodeSelection.getValue() == MethodeType.COPY);
     	processImage();
     }
 
@@ -88,8 +87,6 @@ public class BinarizeViewController {
 		
 		RasterImage origImg = new RasterImage(originalImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
-		
-		int threshold = 128;
 		
 		switch(methodeSelection.getValue()) {
 		case DEPTH:
@@ -115,7 +112,7 @@ public class BinarizeViewController {
 		}*/
 		binImg.setToView(binarizedImageView);
 		
-	   	messageLabel.setText("Processing time: " + (System.currentTimeMillis() - startTime) + " ms, threshold = " + threshold);
+	   	messageLabel.setText("Processing time: " + (System.currentTimeMillis() - startTime) + " ms");
 	}
 	
 
