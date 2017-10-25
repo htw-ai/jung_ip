@@ -90,10 +90,10 @@ public class BinarizeViewController {
 		
 		switch(methodeSelection.getValue()) {
 		case DEPTH:
-			//TODO
+			binImg.debthFirst();
 			break;
 		case BREADTH:
-			// TODO
+			binImg.breadthFirst();
 			break;
 		case SEQUENTIAL:
 			//TODO
@@ -101,7 +101,6 @@ public class BinarizeViewController {
 		default:
 			break;
 		}
-		
 		/*
 		if(outline.isSelected() && methodeSelection.getValue() != MethodeType.COPY) {
 			RasterImage outlineImg = new RasterImage(binImg.width, binImg.height);
