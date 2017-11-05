@@ -1,19 +1,15 @@
-// IP Ue1 WS2017/18
+// IP Ue2 WS2017/18
 //
-// Date: 2017-10-12
+// Date: 2017-11-05
 
 package ip_ws1718;
 
 import java.io.File;
 
 import ip_ws1718.RasterImage;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
@@ -27,7 +23,8 @@ public class BinarizeViewController {
 		
 		private final String name;       
 	    private MethodeType(String s) { name = s; }
-	    public String toString() { return this.name; }
+	    @Override
+		public String toString() { return this.name; }
 	};
 
 	private static final String initialFileName = "tools.png";
@@ -90,7 +87,7 @@ public class BinarizeViewController {
 		
 		switch(methodeSelection.getValue()) {
 		case DEPTH:
-			binImg.debthFirst();
+			binImg.depthFirst();
 			break;
 		case BREADTH:
 			binImg.breadthFirst();

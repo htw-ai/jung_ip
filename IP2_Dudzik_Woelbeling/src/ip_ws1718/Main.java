@@ -1,4 +1,4 @@
-// IP Ue1 WS2017/18 
+// IP Ue2 WS2017/18 
 //
 // Date: 2017-10-12
 
@@ -17,7 +17,7 @@ public class Main extends Application {
 		BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("BinarizeView.fxml"));
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Binarize - Dudzik/Woelbeling");
+		primaryStage.setTitle("Regions - Dudzik/Woelbeling");
 		primaryStage.show();
 	}
 	

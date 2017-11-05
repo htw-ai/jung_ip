@@ -1,20 +1,14 @@
-// IP Ue1 WS2017/18
+// IP Ue2 WS2017/18
 //
-// Date: 2017-10-12
+// Date: 2017-11-05
 
 package ip_ws1718;
 
 import java.io.File;
 import java.util.Arrays;
 
-import java.awt.Point;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
-
-import javax.imageio.ImageIO;
-
-import javax.management.Query;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,7 +21,6 @@ public class RasterImage {
 	private static final int gray  = 0xffa0a0a0;
 	private static final int white = 0xffffffff;
 	private static final int black = 0xff000000;
-	private static final int mask = 0xff;
 
 	public int[] argb;	// pixels represented as ARGB values in scanline order
 	public int width;	// image width in pixels
@@ -124,7 +117,7 @@ public class RasterImage {
 		return ((0xff << 24) | (r << 16) | (g << 8) | b);
 	}
 
-	public void debthFirst() {
+	public void depthFirst() {
 		int length = 0;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
