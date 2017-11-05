@@ -79,7 +79,7 @@ public class BinarizeViewController {
 	private void processImage() {
 		if(originalImageView.getImage() == null)
 			return; // no image: nothing to do
-		
+		messageLabel.setText("");
 		long startTime = System.currentTimeMillis();
 		
 		RasterImage origImg = new RasterImage(originalImageView); 
@@ -87,10 +87,13 @@ public class BinarizeViewController {
 		
 		switch(methodeSelection.getValue()) {
 		case DEPTH:
-			binImg.depthFirst();
+			//binImg.depthFirst();
+			fill(new FloodFillerDepth(), binImg, startTime);
+			
 			break;
 		case BREADTH:
-			binImg.breadthFirst();
+			//binImg.breadthFirst();
+			fill(new FloodFillerBreadth(), binImg, startTime);
 			break;
 		case SEQUENTIAL:
 			//TODO
@@ -98,6 +101,7 @@ public class BinarizeViewController {
 		default:
 			break;
 		}
+		
 		/*
 		if(outline.isSelected() && methodeSelection.getValue() != MethodeType.COPY) {
 			RasterImage outlineImg = new RasterImage(binImg.width, binImg.height);
@@ -108,7 +112,11 @@ public class BinarizeViewController {
 		}*/
 		binImg.setToView(binarizedImageView);
 		
-	   	messageLabel.setText("Processing time: " + (System.currentTimeMillis() - startTime) + " ms");
+	}
+	
+	private void fill(FloodFilling ff, RasterImage binImg, long startTime) {
+		ff.fillRegions(binImg.argb, binImg.height, binImg.width);
+		messageLabel.setText("Processing time: " + (System.currentTimeMillis() - startTime) + " ms, Stack size: " + ff.getStackSize());
 	}
 	
 
