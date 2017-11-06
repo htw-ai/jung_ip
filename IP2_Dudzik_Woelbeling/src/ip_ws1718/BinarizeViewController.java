@@ -18,7 +18,9 @@ public class BinarizeViewController {
 	public enum MethodeType { 
 		COPY("Copy"),
 		DEPTH("Depth First"), 
+		DEPTH2("Depth First (check check before adding)"), 
 		BREADTH("Breadth First"), 
+		BREADTH2("Breadth First (check before adding)"),
 		SEQUENTIAL("Sequential");
 		
 		private final String name;       
@@ -89,11 +91,16 @@ public class BinarizeViewController {
 		case DEPTH:
 			//binImg.depthFirst();
 			fill(new FloodFillerDepth(), binImg, startTime);
-			
+			break;
+		case DEPTH2:
+			fill(new FloodFillerDepthRestricted(), binImg, startTime);
 			break;
 		case BREADTH:
 			//binImg.breadthFirst();
 			fill(new FloodFillerBreadth(), binImg, startTime);
+			break;
+		case BREADTH2:
+			fill(new FloodFillerBreadthRestricted(), binImg, startTime);
 			break;
 		case SEQUENTIAL:
 			//TODO

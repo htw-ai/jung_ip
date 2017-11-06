@@ -28,12 +28,12 @@ public class FloodFillerBreadth implements IterativeFloodFiller {
 	}
 
 	@Override
-	public <T> List<T> createList() {
-		return new Queue<T>();
+	public List<PPoint> createList() {
+		return new Queue<PPoint>();
 	}
 
 	@Override
-	public <T> void saveLength(List<T> queue) {
+	public void saveLength(List<PPoint> queue) {
 		length = (queue.getLength() > length) ? queue.getLength() : length;
 
 	}
@@ -42,5 +42,13 @@ public class FloodFillerBreadth implements IterativeFloodFiller {
 	public int getStackSize() {
 		return length;
 	}
+
+	@Override
+	public void addList(List<PPoint> list, PPoint pp, int pixelcolor, int width, int height) {
+		list.add(pp);
+		
+	}
+	
+	
 
 }

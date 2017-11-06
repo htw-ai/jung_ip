@@ -9,7 +9,7 @@ public class FloodFillerDepth implements IterativeFloodFiller {
 		foregroundColor = 0xff000000; // black
 	}
 
-	public FloodFillerDepth(int foregroundColor, int neighbourType) {
+	public FloodFillerDepth(int foregroundColor) {
 		super();
 		this.foregroundColor = foregroundColor;
 	}
@@ -26,12 +26,12 @@ public class FloodFillerDepth implements IterativeFloodFiller {
 	}
 
 	@Override
-	public <T> List<T> createList() {
-		return new Stack<T>();
+	public List<PPoint> createList() {
+		return new Stack<PPoint>();
 	}
 
 	@Override
-	public <T> void saveLength(List<T> stack) {
+	public void saveLength(List<PPoint> stack) {
 		length = (stack.getLength() > length) ? stack.getLength() : length;
 
 	}
@@ -40,5 +40,13 @@ public class FloodFillerDepth implements IterativeFloodFiller {
 	public int getStackSize() {
 		return length;
 	}
+
+	@Override
+	public void addList(List<PPoint> list, PPoint pp, int pixelcolor, int width, int height) {
+		list.add(pp);
+		
+	}
+	
+	
 
 }

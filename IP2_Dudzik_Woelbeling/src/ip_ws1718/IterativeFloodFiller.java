@@ -7,27 +7,36 @@ public interface IterativeFloodFiller extends FloodFilling {
 
 	@Override
 	public default void fillRegions(int[] argb, int height, int width) {
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				int color = argb[getIndex(i, j, width)];
-				if (color == getForeGroundColour()) {
+		
+		// traverse image and look for foreground pixels
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				int pixel = argb[getIndex(i, j, width)];
+				if (isForegroundColor(pixel)) {
+					
+					// Foreground ( = new region) found -> search for connected pixels
 					List<PPoint> list = createList();
 					Random rand = new Random();
-					int ccolor = generateColor(rand);
-					list.add(new PPoint(i, j, ccolor));
+					int regioncolor = generateColor(rand);	// define region color
+					list.add(new PPoint(i, j, regioncolor));	// seed
+					
+					// search for all pixels of that region
 					while (!list.isEmpty()) {
 						saveLength(list);
-						PPoint p = list.remove();
-						if (argb[getIndex(p.i, p.j, width)] == getForeGroundColour()) {
-							argb[getIndex(p.i, p.j, width)] = p.color;
-							for (int ii = -1; ii < 2; ii++) {
-								for (int jj = -1; jj < 2; jj++) {
+						PPoint p = list.remove();		// take item
+						int ind = getIndex(p.i, p.j, width);
+						//if (argb[getIndex(p.i, p.j, width)] == getForeGroundColour()) {	
+						if (isWithinBoundaries(p.i, p.j, width, height) && isForegroundColor(argb[ind])) {	// 1. check
+							argb[ind] = p.color;	// 2. define region (change color)
+							for (int jj = -1; jj < 2; jj++) {	// 3. put all neighbours on list
+								for (int ii = -1; ii < 2; ii++) {
 									PPoint pp = new PPoint(p.i + ii, p.j + jj, p.color);
-									// Uncomment for Assignment 4
-									// if (true) {
-									if (argb[getIndex(pp.i, pp.j, width)] == getForeGroundColour()) {
+									// TODO: only check for assignment 4
+									// TODO: check boundaries
+									/*if (argb[getIndex(pp.i, pp.j, width)] == getForeGroundColour()) {
 										list.add(pp);
-									}
+									}*/
+									addList(list, pp, argb[getIndex(pp.i, pp.j, width)], width, height);
 								}
 							}
 						}
@@ -36,12 +45,14 @@ public interface IterativeFloodFiller extends FloodFilling {
 			}
 		}
 	}
+	
+	public void addList(List<PPoint> list, PPoint pp, int pixelcolor, int width, int height);
 
 	public int getForeGroundColour();
 
-	public <T> List<T> createList();
+	public List<PPoint> createList();
 
-	<T> void saveLength(List<T> l);
+	public void saveLength(List<PPoint> l);
 
 	/* Helpers */
 	
@@ -64,8 +75,8 @@ public interface IterativeFloodFiller extends FloodFilling {
 		return ((0xff << 24) | (r << 16) | (g << 8) | b);
 	}
 
-	public static int getIndex(int i, int j, int width) {
-		return i*width+j;
+	public static int getIndex(int x, int y, int width) {
+		return y * width + x;
 	}
 
 	class PPoint {
@@ -78,6 +89,19 @@ public interface IterativeFloodFiller extends FloodFilling {
 			this.j = j;
 			this.color = color;
 		}
+	}
+	
+	default boolean isForegroundColor (int col) {
+		if (col == getForeGroundColour()) {
+			return true;
+		}
+		return false;
+	}
+	
+	default boolean isWithinBoundaries(int x, int y, int width, int height) {
+		if (x < 0 || x >= width) return false;
+		if (y < 0 || y >= height) return false;
+		return true;
 	}
 
 }
