@@ -57,9 +57,10 @@ public interface IterativeFloodFiller extends FloodFilling {
 	/* Helpers */
 	
 	public static int generateColor(Random rand) {
-		int r = rand.nextInt(255);
-		int g = rand.nextInt(255);
-		int b = rand.nextInt(255);
+		// random numbers between 1 (!) and 255 --> not 0, because black is no region colour
+		int r = rand.nextInt(255) + 1;
+		int g = rand.nextInt(255) + 1;
+		int b = rand.nextInt(255) + 1;
 
 		return calcPixel(r, g, b);
 	}
