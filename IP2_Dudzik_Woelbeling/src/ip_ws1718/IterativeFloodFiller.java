@@ -48,7 +48,7 @@ public interface IterativeFloodFiller extends FloodFilling {
 	
 	public void addList(List<PPoint> list, PPoint pp, int pixelcolor, int width, int height);
 
-	public int getForeGroundColour();
+	public int getForegroundColor();
 
 	public List<PPoint> createList();
 
@@ -56,13 +56,16 @@ public interface IterativeFloodFiller extends FloodFilling {
 
 	/* Helpers */
 	
-	public static int generateColor(Random rand) {
-		// random numbers between 1 (!) and 255 --> not 0, because black is no region colour
-		int r = rand.nextInt(255) + 1;
-		int g = rand.nextInt(255) + 1;
-		int b = rand.nextInt(255) + 1;
+	default int generateColor(Random rand) {
+		int r = rand.nextInt(256);
+		int g = rand.nextInt(256);
+		int b = rand.nextInt(256);
 
-		return calcPixel(r, g, b);
+		int col = calcPixel(r, g, b);
+		if (col == getForegroundColor()) {		// must not be foreground color!!!
+			col = generateColor(rand);
+		}
+		return col;
 	}
 
 	public static int calcPixel(int r, int g, int b) {
@@ -93,7 +96,7 @@ public interface IterativeFloodFiller extends FloodFilling {
 	}
 	
 	default boolean isForegroundColor (int col) {
-		if (col == getForeGroundColour()) {
+		if (col == getForegroundColor()) {
 			return true;
 		}
 		return false;

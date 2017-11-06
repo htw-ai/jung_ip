@@ -21,7 +21,7 @@ public class FloodFillerDepth implements IterativeFloodFiller {
 	}
 
 	@Override
-	public int getForeGroundColour() {
+	public int getForegroundColor() {
 		return this.foregroundColor;
 	}
 

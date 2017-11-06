@@ -103,7 +103,7 @@ public class BinarizeViewController {
 			fill(new FloodFillerBreadthRestricted(), binImg, startTime);
 			break;
 		case SEQUENTIAL:
-			//TODO
+			fill(new SequentialFloodFiller(), binImg, startTime);
 			break;
 		default:
 			break;
