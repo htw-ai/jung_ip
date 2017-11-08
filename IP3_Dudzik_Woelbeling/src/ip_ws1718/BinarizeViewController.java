@@ -7,9 +7,12 @@ package ip_ws1718;
 import java.io.File;
 
 import ip_ws1718.RasterImage;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
@@ -32,29 +35,33 @@ public class BinarizeViewController {
 	private static final String initialFileName = "tools.png";
 	private static File fileOpenPath = new File(".");
 
-    @FXML
-    private ImageView originalImageView;
+@FXML
+private Slider slider;
+
+@FXML
+private Canvas canvas;
 
     @FXML
     private ImageView binarizedImageView;
 
-    @FXML
-    private ComboBox<MethodeType> methodeSelection;
 
     @FXML
     private Label messageLabel;
 
 	@FXML
 	public void initialize() {
-		// set combo boxes items
-		methodeSelection.getItems().addAll(MethodeType.values());
-		methodeSelection.setValue(MethodeType.COPY);
 		
-		// initialize parameters
-		methodeChanged();
+		// set slider
+				slider.valueProperty().addListener(new ChangeListener<Number>() {
+		            public void changed(ObservableValue<? extends Number> ov,
+		                Number old_val, Number new_val) {
+		            	processImage();
+		            	
+		            }
+		        });
 		
 		// load and process default image
-		new RasterImage(new File(initialFileName)).setToView(originalImageView);
+		new RasterImage(new File(initialFileName)).setToView(binarizedImageView);
 		processImage();
 	}
 	
@@ -66,64 +73,25 @@ public class BinarizeViewController {
 		File selectedFile = fileChooser.showOpenDialog(null);
 		if(selectedFile != null) {
 			fileOpenPath = selectedFile.getParentFile();
-			new RasterImage(selectedFile).setToView(originalImageView);
+			new RasterImage(selectedFile).setToView(binarizedImageView);
 	    	processImage();
 	    	messageLabel.getScene().getWindow().sizeToScene();
 		}
     }
-    
-    @FXML
-    void methodeChanged() {
-    	processImage();
-    }
 
 	
 	private void processImage() {
-		if(originalImageView.getImage() == null)
+		if(binarizedImageView.getImage() == null)
 			return; // no image: nothing to do
-		messageLabel.setText("");
-		long startTime = System.currentTimeMillis();
 		
-		RasterImage origImg = new RasterImage(originalImageView); 
+		int zoom = (int)slider.getValue();
+		messageLabel.setText(zoom + "");
+		
+		RasterImage origImg = new RasterImage(binarizedImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
 		
-		switch(methodeSelection.getValue()) {
-		case DEPTH:
-			//binImg.depthFirst();
-			fill(new FloodFillerDepth(), binImg, startTime);
-			break;
-		case DEPTH2:
-			fill(new FloodFillerDepthRestricted(), binImg, startTime);
-			break;
-		case BREADTH:
-			//binImg.breadthFirst();
-			fill(new FloodFillerBreadth(), binImg, startTime);
-			break;
-		case BREADTH2:
-			fill(new FloodFillerBreadthRestricted(), binImg, startTime);
-			break;
-		case SEQUENTIAL:
-			fill(new SequentialFloodFiller(), binImg, startTime);
-			break;
-		default:
-			break;
-		}
-		
-		/*
-		if(outline.isSelected() && methodeSelection.getValue() != MethodeType.COPY) {
-			RasterImage outlineImg = new RasterImage(binImg.width, binImg.height);
-			Filter.outline(binImg, outlineImg);
-			outlineImg.setToView(binarizedImageView);			
-		} else {
-			binImg.setToView(binarizedImageView);
-		}*/
 		binImg.setToView(binarizedImageView);
 		
-	}
-	
-	private void fill(FloodFilling ff, RasterImage binImg, long startTime) {
-		ff.fillRegions(binImg.argb, binImg.height, binImg.width);
-		messageLabel.setText("Processing time: " + (System.currentTimeMillis() - startTime) + " ms, Stack size: " + ff.getStackSize());
 	}
 	
 
