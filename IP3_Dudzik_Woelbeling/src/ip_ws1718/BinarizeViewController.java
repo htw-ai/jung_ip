@@ -5,6 +5,7 @@
 package ip_ws1718;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import ip_ws1718.RasterImage;
 import javafx.beans.value.ChangeListener;
@@ -89,7 +90,9 @@ private Canvas canvas;
 		
 		RasterImage origImg = new RasterImage(binarizedImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
-		
+
+		ArrayList<ArrayList<Potrace.PPDirection>> objects = Potrace.fillRegions(binImg.argb, binImg.height, binImg.width);
+
 		binImg.setToView(binarizedImageView);
 		
 	}
