@@ -22,10 +22,6 @@ class Potrace {
 
                     list.add(startDirection);
 
-                    if (startDirection.isYMovement()) {
-                        invertRow(argb, width, startDirection.from.j, startDirection.from.i);
-                    }
-
                     // make sure that we go at least one time around
                     while (list.size() < 4 || list.get(0).from.equals(list.get(list.size()-1).from)) {
                         PPDirection last = list.get(list.size()-1);
@@ -33,12 +29,20 @@ class Potrace {
 
                         list.add(next);
 
-                        if (next.isYMovement()) {
-                            invertRow(argb, width, next.from.j, next.from.i);
-                        }
                     }
 
                     list.remove(list.size()-1);
+
+                    list.forEach((next) -> {
+                        if (next.isYMovement()) {
+                            if (next.from.left) {
+                                invertRow(argb, width, next.from.j, next.from.i);
+                            } else {
+                                invertRow(argb, width, next.from.j, next.from.i + 1);
+                            }
+                        }
+                    });
+
                     objects.add(list);
                 }
             }
