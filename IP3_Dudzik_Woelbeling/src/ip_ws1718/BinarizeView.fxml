@@ -53,8 +53,8 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="1" GridPane.columnIndex="2" GridPane.halignment="RIGHT" />
-                        <Label text="20" />
+                        <Label text="20" GridPane.columnIndex="2" GridPane.halignment="RIGHT" />
+                        <Label text="1" />
                         <Button mnemonicParsing="false" onAction="#openImage" text="Open Image" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                         <Label fx:id="messageLabel" alignment="CENTER" text="Message Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                      </children>

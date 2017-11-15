@@ -10,32 +10,22 @@ public class Potracer {
 		WEST(1), 
 		NORTH(2), 
 		EAST(3);
-		private final int value;
+		private int value;
 
 		private GlobalDirection(int value) {
 			this.value = value;
 		}
 	};
-	
-	static int SOUTH = 0;
-	static int WEST = 1;
-	static int NORTH = 2;
-	static int EAST = 3;
 	static int LEFT = 3;
 	static int RIGHT = 1;
-	static int STRAIGHT = 0;
 
-	public enum Direction {
-		LEFT, STRAIGHT, RIGHT
-	}
 	private RasterImage img;
 	static int FOREGROUNDCOLOR = 0xff000000;
 
+	
 	public Potracer(RasterImage img) {
 		this.img = img;
 	}
-
-
 
 	public ArrayList<Kontur> scan () {
 		ArrayList<Kontur> paths = new ArrayList<Kontur>();
@@ -57,34 +47,31 @@ public class Potracer {
 	
 	public Kontur findPaths(int x, int y) {
 		Point start = new Point(x, y);
-		//GlobalDirection dir = GlobalDirection.SOUTH;
-		int dir2 = SOUTH;
+		GlobalDirection dir = GlobalDirection.SOUTH;
 		Point current = start;
 		Kontur path = new Kontur();
 		path.addVertex(start);
-		Point tps, tpd;
+		Pixel tps, tpd;
 				
 		do {
-			current = getNextVertex(current, dir2);	// go in direction
+			current = getNextVertex(current, dir);	// go in direction
 			path.addVertex(current);
 
-			tps = getNextPixelStraight(current, dir2);
-			tpd = getNextPixelDiag(current, dir2);
-					//testpixel = img.getPixel(current.x - 1, current.y + 1);	// TODO. nur zu Testzwecken
+			tps = getNextPixelStraight(current, dir);
+			tpd = getNextPixelDiag(current, dir);
 					if (isForegroundColor(img.getPixel(tpd.x, tpd.y))) {
-						//dir.value = (dir.value + RIGHT) % 4;
-						dir2 = (dir2 + RIGHT) % 4;
+						// turn left (GO LEFT)
+						dir.value = (dir.value + RIGHT) % 4;
 					} else if (isForegroundColor(img.getPixel(tps.x, tps.y))) {
+						// don't change direction (GO STRAIGHT)
 						//dir.value = (dir.value + STRAIGHT) % 4;
-						dir2 = (dir2 + STRAIGHT) % 4;	// weglassen
 					} else {
-						//dir.value = (dir.value + LEFT) % 4;
-						dir2 = (dir2 + LEFT) % 4;
+						// turn right (GO RIGHT)
+						dir.value = (dir.value + LEFT) % 4;
 					}
 				
 			} while (!current.equals(start));
 		
-		//path.addVertex(path.getVertex(0));
 		return path;
 	}
 	
@@ -98,8 +85,7 @@ public class Potracer {
 				invertRow(next.y, next.x);
 			}
 			first = next;
-		}
-		
+		}	
 	}
 	
 	private void invertRow(int row, int startcol) {
@@ -110,51 +96,46 @@ public class Potracer {
 		}
 	}
 	
-	private static Point getNextVertex(Point p, int d) {
-		Point np = p;
-		if (d == SOUTH) {
-			np = new Point(p.x, p.y + 1);
-		} else if (d == WEST) {
-			//if (p.x == 0) throw new ArrayIndexOutOfBoundsException();
-			np = new Point(p.x - 1, p.y);
-		} else if (d == EAST) {
-			np = new Point(p.x + 1, p.y);
-		} else if (d == NORTH) {
-			np = new Point(p.x, p.y - 1);
+	private static Point getNextVertex(Point p, GlobalDirection d) {
+		if (d == GlobalDirection.SOUTH) {
+			return new Point(p.x, p.y + 1);
+		} else if (d == GlobalDirection.WEST) {
+			return new Point(p.x - 1, p.y);
+		} else if (d == GlobalDirection.EAST) {
+			return new Point(p.x + 1, p.y);
+		} else if (d == GlobalDirection.NORTH) {
+			return new Point(p.x, p.y - 1);
+		} else {
+			return null;
 		}
-		
-		return np;
 	}
 	
-	private Point getNextPixelDiag(Point p, int d) {
-		Point np = p;
-		if (d == SOUTH) {
-			np = new Point(p.x - 1, p.y);
-		} else if (d == WEST) {
-			//if (p.x == 0) throw new ArrayIndexOutOfBoundsException();
-			np = new Point(p.x - 1, p.y - 1);
-		} else if (d == EAST) {
-			np = new Point(p.x, p.y);
-		} else if (d == NORTH) {
-			np = new Point(p.x, p.y - 1);
+	private Pixel getNextPixelDiag(Point p, GlobalDirection d) {
+		if (d == GlobalDirection.SOUTH) {
+			return new Pixel(p.x - 1, p.y);
+		} else if (d == GlobalDirection.WEST) {
+			return new Pixel(p.x - 1, p.y - 1);
+		} else if (d == GlobalDirection.EAST) {
+			return new Pixel(p.x, p.y);
+		} else if (d == GlobalDirection.NORTH) {
+			return new Pixel(p.x, p.y - 1);
+		} else {
+			return null;
 		}
-		
-		return np;
 	}
 	
-	private Point getNextPixelStraight(Point p, int d) {
-		Point np = p;
-		if (d == SOUTH) {
-			np = new Point(p.x, p.y);
-		} else if (d == WEST) {
-			np = new Point(p.x - 1, p.y);
-		} else if (d == EAST) {
-			np = new Point(p.x, p.y - 1);
-		} else if (d == NORTH) {
-			np = new Point(p.x - 1, p.y - 1);
+	private Pixel getNextPixelStraight(Point p, GlobalDirection d) {
+		if (d == GlobalDirection.SOUTH) {
+			return new Pixel(p.x, p.y);
+		} else if (d == GlobalDirection.WEST) {
+			return new Pixel(p.x - 1, p.y);
+		} else if (d == GlobalDirection.EAST) {
+			return new Pixel(p.x, p.y - 1);
+		} else if (d == GlobalDirection.NORTH) {
+			return new Pixel(p.x - 1, p.y - 1);
+		} else {
+			return null;
 		}
-		
-		return np;
 	}
 	
 	public static boolean isForegroundColor (int col) {
@@ -163,11 +144,23 @@ public class Potracer {
 	
 	public boolean isForegroundPixel (Point p) {
 		// if out of bounds: background
-		if (p.x < 0 || p.y < 0) return false;
-		if (p.x >= img.width || p.y >= img.height) return false;
+		if (p.x < 0 || p.y < 0) 
+			return false;
+		if (p.x >= img.width || p.y >= img.height) 
+			return false;
 		
 		// test pixel color
 		return isForegroundColor(img.getPixel(p.x, p.y));
+	}
+	
+	private class Pixel {
+		public int x;
+		public int y;
+		public Pixel(int x, int y) {
+			super();
+			this.x = x;
+			this.y = y;
+		}
 	}
 
 }

@@ -33,7 +33,8 @@ public class BinarizeViewController {
 		public String toString() { return this.name; }
 	};
 
-	private static final String initialFileName = "testkleinu.png";
+	private static final String initialFileName = "tools.png";
+	//private static final String initialFileName = "testkleinu.png";
 	private static File fileOpenPath = new File(".");
 
 @FXML
@@ -94,7 +95,7 @@ private Canvas canvas;
 		//ArrayList<ArrayList<Potrace.PPDirection>> objects = Potrace.fillRegions(binImg.argb, binImg.height, binImg.width);
 		ArrayList<Kontur> regions = new Potracer(binImg).scan();
 
-		binImg.setToView(binarizedImageView);
+		//binImg.setToView(binarizedImageView);
 		
 	}
 	
