@@ -23,7 +23,7 @@ class Potrace {
                     list.add(startDirection);
 
                     if (startDirection.isYMovement()) {
-                        invertRow(argb, width, startDirection.from.j, startDirection.from.i);
+                        //invertRow(argb, width, startDirection.from.j, startDirection.from.i);
                     }
 
                     // make sure that we go at least one time around
@@ -34,7 +34,7 @@ class Potrace {
                         list.add(next);
 
                         if (next.isYMovement()) {
-                            invertRow(argb, width, next.from.j, next.from.i);
+                            //invertRow(argb, width, next.from.j, next.from.i);
                         }
                     }
 

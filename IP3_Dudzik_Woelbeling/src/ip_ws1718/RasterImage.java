@@ -80,6 +80,18 @@ public class RasterImage {
 		}
 	}
 	
+	public int getPixel(int x, int y) {
+		return argb[getIndex(x, y)];
+	}
+	
+	public void setPixel(int x, int y, int col) {
+		argb[getIndex(x, y)] = col;
+	}
+	
+	private int getIndex (int x, int y) {
+		return y * width + x;
+	}
+	
 	// image point operations to be added here
 	
 	
