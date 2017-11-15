@@ -24,46 +24,47 @@ public class BinarizeViewController {
 	//private static final String initialFileName = "tools.png";
 	private static final String initialFileName = "testkleinu.png";
 	private static File fileOpenPath = new File(".");
-	
+
 	private int zoom = 1;
 	private int imageWidth = 0;
 	private int imageHeight = 0;
 
-@FXML
-private Slider slider;
+	@FXML
+	private Slider slider;
 
-@FXML
-private Canvas canvas;
+	@FXML
+	private Canvas canvas;
 
-    @FXML
-    private ImageView binarizedImageView;
+	@FXML
+	private ImageView binarizedImageView;
 
 
-    @FXML
-    private Label messageLabel;
+	@FXML
+	private Label messageLabel;
 
 	@FXML
 	public void initialize() {
-		
+
 		// set slider
-				slider.valueProperty().addListener(new ChangeListener<Number>() {
-		            public void changed(ObservableValue<? extends Number> ov,
-		                Number old_val, Number new_val) {
-		            	
-		            	zoom = new_val.intValue();
-		            	zoomChanged();
-		            	
-		            }
-		        });
-		
+		slider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov,
+					Number old_val, Number new_val) {
+
+				zoom = new_val.intValue();
+				zoomChanged();
+
+			}
+		});
+
 		// load and process default image
 		new RasterImage(new File(initialFileName)).setToView(binarizedImageView);
 		processImage();
 		messageLabel.setText(zoom + "");
 	}
-	
-    @FXML
-    void openImage() {
+
+	@FXML
+	void openImage() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialDirectory(fileOpenPath); 
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images (*.jpg, *.png, *.gif)", "*.jpeg", "*.jpg", "*.png", "*.gif"));
@@ -71,20 +72,20 @@ private Canvas canvas;
 		if(selectedFile != null) {
 			fileOpenPath = selectedFile.getParentFile();
 			new RasterImage(selectedFile).setToView(binarizedImageView);
-	    	processImage();
-	    	messageLabel.getScene().getWindow().sizeToScene();
+			processImage();
+			messageLabel.getScene().getWindow().sizeToScene();
 		}
-    }
+	}
 
-	
+
 	private void processImage() {
 		if(binarizedImageView.getImage() == null)
 			return; // no image: nothing to do
-		
-		
+
+
 		RasterImage origImg = new RasterImage(binarizedImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
-		
+
 		imageWidth = origImg.width;
 		imageHeight = origImg.height;
 		binarizedImageView.setFitWidth(imageWidth);
@@ -92,9 +93,9 @@ private Canvas canvas;
 
 		ArrayList<Kontur> regions = new Potracer(binImg).scan();
 		drawOverlay();
-		
+
 	}
-	
+
 	private void zoomChanged() {
 		messageLabel.setText(zoom + "");
 		double zoomedWidth = Math. ceil (zoom * imageWidth);

@@ -7,9 +7,6 @@ package ip_ws1718;
 import java.io.File;
 import java.util.Arrays;
 
-import java.util.LinkedList;
-import java.util.Random;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
@@ -17,7 +14,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 
 public class RasterImage {
-	
+
 	private static final int gray  = 0xffa0a0a0;
 	private static final int white = 0xffffffff;
 	private static final int black = 0xff000000;
@@ -25,7 +22,7 @@ public class RasterImage {
 	public int[] argb;	// pixels represented as ARGB values in scanline order
 	public int width;	// image width in pixels
 	public int height;	// image height in pixels
-	
+
 	public RasterImage(int width, int height) {
 		// creates an empty RasterImage of given size
 		this.width = width;
@@ -33,14 +30,14 @@ public class RasterImage {
 		argb = new int[width * height];
 		Arrays.fill(argb, gray);
 	}
-	
+
 	public RasterImage(RasterImage image) {
 		// copy constructor
 		width = image.width;
 		height = image.height;
 		argb = image.argb.clone();
 	}
-	
+
 	public RasterImage(File file) {
 		// creates an RasterImage by reading the given file
 		Image image = null;
@@ -60,7 +57,7 @@ public class RasterImage {
 			Arrays.fill(argb, gray);
 		}
 	}
-	
+
 	public RasterImage(ImageView imageView) {
 		// creates a RasterImage from that what is shown in the given ImageView
 		Image image = imageView.getImage();
@@ -69,7 +66,7 @@ public class RasterImage {
 		argb = new int[width * height];
 		image.getPixelReader().getPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), argb, 0, width);
 	}
-	
+
 	public void setToView(ImageView imageView) {
 		// sets the current argb pixels to be shown in the given ImageView
 		if(argb != null) {
@@ -79,22 +76,22 @@ public class RasterImage {
 			imageView.setImage(wr);
 		}
 	}
-	
+
 	public int getPixel(int x, int y) {
 		return argb[getIndex(x, y)];
 	}
-	
+
 	public void setPixel(int x, int y, int col) {
 		argb[getIndex(x, y)] = col;
 	}
-	
+
 	private int getIndex (int x, int y) {
 		int index = y * width + x;
 		return index;
 	}
-	
+
 	// image point operations to be added here
-	
-	
+
+
 }
 

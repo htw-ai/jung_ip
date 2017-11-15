@@ -8,12 +8,12 @@ public class Kontur {
 	public enum Contourtype {internal, external, undetermined};
 	private Contourtype type;
 	private ArrayList<Point> vertices;
-	
+
 	public Kontur() {
 		vertices = new ArrayList<Point>();
 		type = Contourtype.undetermined;
 	}
-	
+
 	public void addVertex(Point p) {
 		vertices.add(p);
 	}
@@ -33,7 +33,7 @@ public class Kontur {
 	public void setVertices(ArrayList<Point> vertices) {
 		this.vertices = vertices;
 	}
-	
+
 	public Point getVertex (int index) {
 		return vertices.get(index);
 	}
