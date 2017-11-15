@@ -5,17 +5,10 @@ import java.util.ArrayList;
 
 public class Potracer {
 
-	public enum GlobalDirection {
-		SOUTH(0), 
-		WEST(1), 
-		NORTH(2), 
-		EAST(3);
-		private int value;
-
-		private GlobalDirection(int value) {
-			this.value = value;
-		}
-	};
+	static int SOUTH = 0;
+	static int WEST = 1;
+	static int NORTH = 2;
+	static int EAST = 3;
 	static int LEFT = 3;
 	static int RIGHT = 1;
 
@@ -47,27 +40,26 @@ public class Potracer {
 	
 	public Kontur findPaths(int x, int y) {
 		Point start = new Point(x, y);
-		GlobalDirection dir = GlobalDirection.SOUTH;
+		int dir2 = SOUTH;
 		Point current = start;
 		Kontur path = new Kontur();
 		path.addVertex(start);
 		Pixel tps, tpd;
 				
 		do {
-			current = getNextVertex(current, dir);	// go in direction
+			current = getNextVertex(current, dir2);	// go in direction
 			path.addVertex(current);
-
-			tps = getNextPixelStraight(current, dir);
-			tpd = getNextPixelDiag(current, dir);
+			tpd = getNextPixelDiag(current, dir2);
+			tps = getNextPixelStraight(current, dir2);
+			
 					if (isForegroundColor(img.getPixel(tpd.x, tpd.y))) {
-						// turn left (GO LEFT)
-						dir.value = (dir.value + RIGHT) % 4;
+						// turn right (GO RIGHT)
+						dir2 = (dir2 + RIGHT) % 4;
 					} else if (isForegroundColor(img.getPixel(tps.x, tps.y))) {
 						// don't change direction (GO STRAIGHT)
-						//dir.value = (dir.value + STRAIGHT) % 4;
 					} else {
-						// turn right (GO RIGHT)
-						dir.value = (dir.value + LEFT) % 4;
+						// turn left (GO LEFT)
+						dir2 = (dir2 + LEFT) % 4;
 					}
 				
 			} while (!current.equals(start));
@@ -96,42 +88,42 @@ public class Potracer {
 		}
 	}
 	
-	private static Point getNextVertex(Point p, GlobalDirection d) {
-		if (d == GlobalDirection.SOUTH) {
+	private static Point getNextVertex(Point p, int d) {
+		if (d == SOUTH) {
 			return new Point(p.x, p.y + 1);
-		} else if (d == GlobalDirection.WEST) {
+		} else if (d == WEST) {
 			return new Point(p.x - 1, p.y);
-		} else if (d == GlobalDirection.EAST) {
+		} else if (d == EAST) {
 			return new Point(p.x + 1, p.y);
-		} else if (d == GlobalDirection.NORTH) {
+		} else if (d == NORTH) {
 			return new Point(p.x, p.y - 1);
 		} else {
 			return null;
 		}
 	}
 	
-	private Pixel getNextPixelDiag(Point p, GlobalDirection d) {
-		if (d == GlobalDirection.SOUTH) {
+	private Pixel getNextPixelDiag(Point p, int d) {
+		if (d == SOUTH) {
 			return new Pixel(p.x - 1, p.y);
-		} else if (d == GlobalDirection.WEST) {
+		} else if (d == WEST) {
 			return new Pixel(p.x - 1, p.y - 1);
-		} else if (d == GlobalDirection.EAST) {
+		} else if (d == EAST) {
 			return new Pixel(p.x, p.y);
-		} else if (d == GlobalDirection.NORTH) {
+		} else if (d == NORTH) {
 			return new Pixel(p.x, p.y - 1);
 		} else {
 			return null;
 		}
 	}
 	
-	private Pixel getNextPixelStraight(Point p, GlobalDirection d) {
-		if (d == GlobalDirection.SOUTH) {
+	private Pixel getNextPixelStraight(Point p, int d) {
+		if (d == SOUTH) {
 			return new Pixel(p.x, p.y);
-		} else if (d == GlobalDirection.WEST) {
+		} else if (d == WEST) {
 			return new Pixel(p.x - 1, p.y);
-		} else if (d == GlobalDirection.EAST) {
+		} else if (d == EAST) {
 			return new Pixel(p.x, p.y - 1);
-		} else if (d == GlobalDirection.NORTH) {
+		} else if (d == NORTH) {
 			return new Pixel(p.x - 1, p.y - 1);
 		} else {
 			return null;
