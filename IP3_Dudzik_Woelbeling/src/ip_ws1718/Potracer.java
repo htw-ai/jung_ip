@@ -65,58 +65,52 @@ public class Potracer {
 		Point tps, tpd;
 				
 		do {
-			current = getNext(current, dir2);	// go in direction
+			current = getNextVertex(current, dir2);	// go in direction
 			path.addVertex(current);
 
-			if (current.y < (img.height - 1)) {
-				if (current.x > 0) {	// ab 2. Spalte
+			tps = getNextPixelStraight(current, dir2);
+			tpd = getNextPixelDiag(current, dir2);
 					//testpixel = img.getPixel(current.x - 1, current.y + 1);	// TODO. nur zu Testzwecken
-					if (isForegroundColor(img.getPixel(current.x - 1, current.y + 1))) {
+					if (isForegroundColor(img.getPixel(tpd.x, tpd.y))) {
 						//dir.value = (dir.value + RIGHT) % 4;
 						dir2 = (dir2 + RIGHT) % 4;
-					} else if (isForegroundColor(img.getPixel(current.x, current.y + 1))) {
+					} else if (isForegroundColor(img.getPixel(tps.x, tps.y))) {
 						//dir.value = (dir.value + STRAIGHT) % 4;
 						dir2 = (dir2 + STRAIGHT) % 4;	// weglassen
 					} else {
 						//dir.value = (dir.value + LEFT) % 4;
 						dir2 = (dir2 + LEFT) % 4;
 					}
-				} else {	// 1. Spalte
-					if (isForegroundColor(img.getPixel(current.x, current.y + 1))) {
-						//dir.value = (dir.value + STRAIGHT) % 4;
-						dir2 = (dir2 + STRAIGHT) % 4;	// weglassen
-					} else {
-						//dir.value = (dir.value + LEFT) % 4;
-						dir2 = (dir2 + LEFT) % 4;
-					}
-				} 
-			} else {
-					//dir.value = (dir.value + LEFT) % 4;
-					dir2 = (dir2 + LEFT) % 4;
-				}
-
-			} while (current != start);
+				
+			} while (!current.equals(start));
 		
-		path.addVertex(path.getVertex(0));
+		//path.addVertex(path.getVertex(0));
 		return path;
 	}
 	
 	public void invertContour (Kontur k) {
 		Point first = k.getVertex(0);
-		int color;
 		for (Point next: k.getVertices()) {
 			if (next.equals(first)) continue;
-			if (first.getY() != first.getY()) {
-				color = img.getPixel((int)first.getX(), (int)first.getY());
-				color = (color == 0xff)? 0xff000000 : 0xff;		// invert color
-				img.setPixel((int)first.getX(), (int)first.getY(), color);
+			if (first.y < next.y) {
+				invertRow(first.y, first.x);
+			} else if (first.y > next.y) {
+				invertRow(next.y, next.x);
 			}
 			first = next;
 		}
 		
 	}
 	
-	private static Point getNext(Point p, int d) {
+	private void invertRow(int row, int startcol) {
+		for (int x = startcol; x < img.width; x++) {
+			int color = img.getPixel(x, row);
+			color = (color == 0xffffffff)? 0xff000000 : 0xffffffff;		// invert color
+			img.setPixel(x, row, color);
+		}
+	}
+	
+	private static Point getNextVertex(Point p, int d) {
 		Point np = p;
 		if (d == SOUTH) {
 			np = new Point(p.x, p.y + 1);
@@ -132,17 +126,32 @@ public class Potracer {
 		return np;
 	}
 	
-	private Point getNextDiag(Point p, int d) {
+	private Point getNextPixelDiag(Point p, int d) {
 		Point np = p;
 		if (d == SOUTH) {
-			np = new Point(p.x - 1, p.y + 1);
+			np = new Point(p.x - 1, p.y);
 		} else if (d == WEST) {
 			//if (p.x == 0) throw new ArrayIndexOutOfBoundsException();
 			np = new Point(p.x - 1, p.y - 1);
 		} else if (d == EAST) {
-			np = new Point(p.x + 1, p.y + 1);
+			np = new Point(p.x, p.y);
 		} else if (d == NORTH) {
-			np = new Point(p.x + 1, p.y - 1);
+			np = new Point(p.x, p.y - 1);
+		}
+		
+		return np;
+	}
+	
+	private Point getNextPixelStraight(Point p, int d) {
+		Point np = p;
+		if (d == SOUTH) {
+			np = new Point(p.x, p.y);
+		} else if (d == WEST) {
+			np = new Point(p.x - 1, p.y);
+		} else if (d == EAST) {
+			np = new Point(p.x, p.y - 1);
+		} else if (d == NORTH) {
+			np = new Point(p.x - 1, p.y - 1);
 		}
 		
 		return np;
