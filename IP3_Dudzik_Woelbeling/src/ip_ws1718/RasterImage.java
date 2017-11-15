@@ -89,7 +89,8 @@ public class RasterImage {
 	}
 	
 	private int getIndex (int x, int y) {
-		return y * width + x;
+		int index = y * width + x;
+		return index;
 	}
 	
 	// image point operations to be added here

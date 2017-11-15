@@ -1,6 +1,6 @@
-// IP Ue2 WS2017/18
+// IP Ue3 WS2017/18
 //
-// Date: 2017-11-05
+// Date: 2017-11-15
 
 package ip_ws1718;
 
@@ -12,30 +12,22 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 public class BinarizeViewController {
-	
-	public enum MethodeType { 
-		COPY("Copy"),
-		DEPTH("Depth First"), 
-		DEPTH2("Depth First (check check before adding)"), 
-		BREADTH("Breadth First"), 
-		BREADTH2("Breadth First (check before adding)"),
-		SEQUENTIAL("Sequential");
-		
-		private final String name;       
-	    private MethodeType(String s) { name = s; }
-	    @Override
-		public String toString() { return this.name; }
-	};
 
-	private static final String initialFileName = "tools.png";
-	//private static final String initialFileName = "testkleinu.png";
+	//private static final String initialFileName = "tools.png";
+	private static final String initialFileName = "testkleinu.png";
 	private static File fileOpenPath = new File(".");
+	
+	private int zoom = 1;
+	private int imageWidth = 0;
+	private int imageHeight = 0;
 
 @FXML
 private Slider slider;
@@ -57,7 +49,9 @@ private Canvas canvas;
 				slider.valueProperty().addListener(new ChangeListener<Number>() {
 		            public void changed(ObservableValue<? extends Number> ov,
 		                Number old_val, Number new_val) {
-		            	processImage();
+		            	
+		            	zoom = new_val.intValue();
+		            	zoomChanged();
 		            	
 		            }
 		        });
@@ -65,6 +59,7 @@ private Canvas canvas;
 		// load and process default image
 		new RasterImage(new File(initialFileName)).setToView(binarizedImageView);
 		processImage();
+		messageLabel.setText(zoom + "");
 	}
 	
     @FXML
@@ -86,18 +81,48 @@ private Canvas canvas;
 		if(binarizedImageView.getImage() == null)
 			return; // no image: nothing to do
 		
-		int zoom = (int)slider.getValue();
-		messageLabel.setText(zoom + "");
 		
 		RasterImage origImg = new RasterImage(binarizedImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
+		
+		imageWidth = origImg.width;
+		imageHeight = origImg.height;
+		binarizedImageView.setFitWidth(imageWidth);
+		binarizedImageView.setFitHeight(imageHeight);
 
-		//ArrayList<ArrayList<Potrace.PPDirection>> objects = Potrace.fillRegions(binImg.argb, binImg.height, binImg.width);
 		ArrayList<Kontur> regions = new Potracer(binImg).scan();
-
-		//binImg.setToView(binarizedImageView);
+		drawOverlay();
 		
 	}
 	
+	private void zoomChanged() {
+		messageLabel.setText(zoom + "");
+		double zoomedWidth = Math. ceil (zoom * imageWidth);
+		double zoomedHeight = Math. ceil (zoom * imageHeight);
+		binarizedImageView.setFitWidth(zoomedWidth);
+		binarizedImageView.setFitHeight(zoomedHeight);
+		drawOverlay();
+	}
+
+	private void drawOverlay() {
+		double zoomedWidth = Math. ceil (zoom * imageWidth);
+		double zoomedHeight = Math. ceil (zoom * imageHeight);
+		canvas.setWidth(zoomedWidth);
+		canvas.setHeight(zoomedHeight);
+
+		// overlay example: draw a grit
+		int gritPixelDistance = 16;
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
+		gc.setStroke(Color. RED);
+		gc.setLineWidth(1);
+		double gritSpacing = zoom * gritPixelDistance;
+		for(double y = 0; y <= zoomedHeight; y += gritSpacing) {
+			gc.strokeLine(0, y, zoomedWidth, y);
+		}
+		for(double x = 0; x <= zoomedWidth; x += gritSpacing) {
+			gc.strokeLine(x, 0, x, zoomedHeight);
+		}
+	}
 
 }
