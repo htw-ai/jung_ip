@@ -62,7 +62,11 @@ public class BinarizeViewController {
 		});
 
 		// load and process default image
-		new RasterImage(new File(initialFileName)).setToView(binarizedImageView);
+		File loadedPicture = new File(initialFileName);
+		RasterImage image = new RasterImage(loadedPicture);
+		Image img = new Image(loadedPicture.toURI().toString(), image.width, image.height, true, false);
+		binarizedImageView.setImage(img);
+
 		processImage();
 		messageLabel.setText(zoom + "");
 	}
@@ -77,10 +81,11 @@ public class BinarizeViewController {
 			initialFileName = selectedFile.getAbsolutePath();
 			fileOpenPath = selectedFile.getParentFile();
 
-			RasterImage image = new RasterImage(selectedFile);
-			Image img = new Image(new File(initialFileName).toURI().toString(), image.width, image.height, true, false);
+			File loadedPicture = new File(initialFileName);
+			RasterImage image = new RasterImage(loadedPicture);
+			Image img = new Image(loadedPicture.toURI().toString(), image.width, image.height, true, false);
 			binarizedImageView.setImage(img);
-
+			
 			processImage();
 			messageLabel.getScene().getWindow().sizeToScene();
 		}
