@@ -114,22 +114,20 @@ public class BinarizeViewController {
 		canvas.setWidth(zoomedWidth);
 		canvas.setHeight(zoomedHeight);
 
-		// overlay example: draw a grit
-		int gritPixelDistance = 16;
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
-		gc.setStroke(Color. RED);
+		gc.setStroke(Color.RED);
 		gc.setLineWidth(1);
-		// double gritSpacing = zoom * gritPixelDistance;
 		for (Kontur region : regions) {
-			Polyline line = new Polyline();
+			Color color = (region.getType() == Kontur.Contourtype.internal) ? Color.BLUE : Color.RED;
+			gc.setStroke(color);
 			ArrayList<Point> points = region.getVertices();
 			int pointSize = points.size() -1;
 			double[] xs = new double[pointSize];
 			double[] ys = new double[pointSize];
 			for (int i = 0; i < pointSize; i++) {
-				xs[i] = (double) points.get(i).x;
-				ys[i] = (double) points.get(i).y;
+				xs[i] = (double) points.get(i).x * zoom;
+				ys[i] = (double) points.get(i).y * zoom;
 			}
 			gc.strokePolygon(xs, ys, pointSize);
 		}
