@@ -4,6 +4,7 @@
 
 package ip_ws1718;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -17,17 +18,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polyline;
 import javafx.stage.FileChooser;
 
 public class BinarizeViewController {
 
 	//private static final String initialFileName = "tools.png";
-	private static final String initialFileName = "testkleinu.png";
+	private static final String initialFileName = "tools.png";
 	private static File fileOpenPath = new File(".");
 
 	private int zoom = 1;
 	private int imageWidth = 0;
 	private int imageHeight = 0;
+	ArrayList<Kontur> regions;
 
 	@FXML
 	private Slider slider;
@@ -91,23 +94,23 @@ public class BinarizeViewController {
 		binarizedImageView.setFitWidth(imageWidth);
 		binarizedImageView.setFitHeight(imageHeight);
 
-		ArrayList<Kontur> regions = new Potracer(binImg).scan();
+		regions = new Potracer(binImg).scan();
 		drawOverlay();
 
 	}
 
 	private void zoomChanged() {
 		messageLabel.setText(zoom + "");
-		double zoomedWidth = Math. ceil (zoom * imageWidth);
-		double zoomedHeight = Math. ceil (zoom * imageHeight);
+		double zoomedWidth = Math.ceil (zoom * imageWidth);
+		double zoomedHeight = Math.ceil (zoom * imageHeight);
 		binarizedImageView.setFitWidth(zoomedWidth);
 		binarizedImageView.setFitHeight(zoomedHeight);
 		drawOverlay();
 	}
 
 	private void drawOverlay() {
-		double zoomedWidth = Math. ceil (zoom * imageWidth);
-		double zoomedHeight = Math. ceil (zoom * imageHeight);
+		double zoomedWidth = Math.ceil (zoom * imageWidth);
+		double zoomedHeight = Math.ceil (zoom * imageHeight);
 		canvas.setWidth(zoomedWidth);
 		canvas.setHeight(zoomedHeight);
 
@@ -117,12 +120,18 @@ public class BinarizeViewController {
 		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
 		gc.setStroke(Color. RED);
 		gc.setLineWidth(1);
-		double gritSpacing = zoom * gritPixelDistance;
-		for(double y = 0; y <= zoomedHeight; y += gritSpacing) {
-			gc.strokeLine(0, y, zoomedWidth, y);
-		}
-		for(double x = 0; x <= zoomedWidth; x += gritSpacing) {
-			gc.strokeLine(x, 0, x, zoomedHeight);
+		// double gritSpacing = zoom * gritPixelDistance;
+		for (Kontur region : regions) {
+			Polyline line = new Polyline();
+			ArrayList<Point> points = region.getVertices();
+			int pointSize = points.size() -1;
+			double[] xs = new double[pointSize];
+			double[] ys = new double[pointSize];
+			for (int i = 0; i < pointSize; i++) {
+				xs[i] = (double) points.get(i).x;
+				ys[i] = (double) points.get(i).y;
+			}
+			gc.strokePolygon(xs, ys, pointSize);
 		}
 	}
 
