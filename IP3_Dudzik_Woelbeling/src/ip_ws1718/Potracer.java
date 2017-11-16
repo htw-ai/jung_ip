@@ -1,3 +1,7 @@
+// IP Ue3 WS2017/18
+//
+// Date: 2017-11-15
+
 package ip_ws1718;
 
 import java.awt.Point;
@@ -5,6 +9,9 @@ import java.util.ArrayList;
 
 import ip_ws1718.Kontur.Contourtype;
 
+/**
+ * Potracer Algorithm
+ */
 public class Potracer {
 
 	static int SOUTH = 0;
@@ -17,11 +24,18 @@ public class Potracer {
 	private RasterImage img;
 	static int FOREGROUNDCOLOR = 0xff000000;
 
-
+	/**
+	 * Constructor
+	 * @param img original binary image
+	 */
 	public Potracer(RasterImage img) {
 		this.img = img;
 	}
 
+	/**
+	 * scan the picture for starting points and do the potrace
+	 * @return list of regions
+	 */
 	public ArrayList<Kontur> scan () {
 		ArrayList<Kontur> paths = new ArrayList<Kontur>();
 		Kontur k;
@@ -42,6 +56,12 @@ public class Potracer {
 		return paths;
 	}
 
+	/**
+	 * follow the contour
+	 * @param x	start point: foreground pixel (x)
+	 * @param y start point: foreground pixel (y)
+	 * @return contour object
+	 */
 	public Kontur findPaths(int x, int y) {
 		Point start = new Point(x, y);
 		int dir2 = SOUTH;
@@ -71,6 +91,10 @@ public class Potracer {
 		return path;
 	}
 
+	/**
+	 * invert the whole region (everything within contour)
+	 * @param k contour object
+	 */
 	public void invertContour (Kontur k) {
 		Point first = k.getVertex(0);
 		for (Point next: k.getVertices()) {
@@ -84,6 +108,11 @@ public class Potracer {
 		}	
 	}
 
+	/**
+	 * invert the rest of the row (beginning with current column)
+	 * @param row row index
+	 * @param startcol index of start column
+	 */
 	private void invertRow(int row, int startcol) {
 		for (int x = startcol; x < img.width; x++) {
 			int color = img.getPixel(x, row);
@@ -92,6 +121,11 @@ public class Potracer {
 		}
 	}
 	
+	/**
+	 * find the type of each contour
+	 * -> test pixel next to first edge in order to identify contour type (internal or external)
+	 * @param list list of contour paths
+	 */
 	private void findContourType(ArrayList<Kontur> list) {
 		for (Kontur cont : list) {
 			Point first = cont.getVertex(0);
@@ -103,6 +137,12 @@ public class Potracer {
 		}
 	}
 
+	/**
+	 * get next contour point (go one step in given direction)
+	 * @param p current contour point
+	 * @param d direction code
+	 * @return new contour point
+	 */
 	private static Point getNextVertex(Point p, int d) {
 		if (d == SOUTH) {
 			return new Point(p.x, p.y + 1);
@@ -117,6 +157,12 @@ public class Potracer {
 		}
 	}
 
+	/**
+	 * get next test pixel (the one in front (right) in edge direction)
+	 * @param p current contour point
+	 * @param d direction code
+	 * @return pixel to be inspected
+	 */
 	private Pixel getNextPixelDiag(Point p, int d) {
 		if (d == SOUTH) {
 			return new Pixel(p.x - 1, p.y);
@@ -131,6 +177,12 @@ public class Potracer {
 		}
 	}
 
+	/**
+	 * get next test pixel (the one in front (left) in edge direction)
+	 * @param p current contour point
+	 * @param d direction code
+	 * @return pixel to be inspected
+	 */
 	private Pixel getNextPixelStraight(Point p, int d) {
 		if (d == SOUTH) {
 			return new Pixel(p.x, p.y);
@@ -145,10 +197,20 @@ public class Potracer {
 		}
 	}
 
+	/**
+	 * checks if color equals foreground color
+	 * @param col color to be tested
+	 * @return true if color is foreground color
+	 */
 	public static boolean isForegroundColor (int col) {
 		return col == FOREGROUNDCOLOR;
 	}
 
+	/**
+	 * checks for foreground pixels
+	 * @param p pixel (as Point)
+	 * @return true, if pixel has foreground color; false, in case the pixel does not exist (out of bounds) or has background color.
+	 */
 	public boolean isForegroundPixel (Point p) {
 		// if out of bounds: background
 		if (p.x < 0 || p.y < 0) 
@@ -160,6 +222,9 @@ public class Potracer {
 		return isForegroundColor(img.getPixel(p.x, p.y));
 	}
 
+	/**
+	 *	Data structure for a Pixel (as opposed to a vertex represented by class Point)
+	 */
 	private class Pixel {
 		public int x;
 		public int y;

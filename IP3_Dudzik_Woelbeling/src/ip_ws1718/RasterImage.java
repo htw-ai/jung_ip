@@ -1,6 +1,6 @@
-// IP Ue2 WS2017/18
+// IP Ue3 WS2017/18
 //
-// Date: 2017-11-05
+// Date: 2017-11-15
 
 package ip_ws1718;
 
@@ -13,6 +13,10 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 
+/**
+ * 
+ *
+ */
 public class RasterImage {
 
 	private static final int gray  = 0xffa0a0a0;
@@ -31,6 +35,10 @@ public class RasterImage {
 		Arrays.fill(argb, gray);
 	}
 
+	/**
+	 * Copy Constructor
+	 * @param image image to be copied
+	 */
 	public RasterImage(RasterImage image) {
 		// copy constructor
 		width = image.width;
@@ -77,14 +85,32 @@ public class RasterImage {
 		}
 	}
 
+	/**
+	 * get color value of single pixel
+	 * @param x coordinate of x axis
+	 * @param y coordinate of y axis
+	 * @return color value (argb)
+	 */
 	public int getPixel(int x, int y) {
 		return argb[getIndex(x, y)];
 	}
 
+	/**
+	 * set color
+	 * @param x coordinate of x axis
+	 * @param y coordinate of y axis
+	 * @param col argb value
+	 */
 	public void setPixel(int x, int y, int col) {
 		argb[getIndex(x, y)] = col;
 	}
 
+	/**
+	 * helper method: calculate index from x and y coordinate
+	 * @param x coordinate of x axis
+	 * @param y coordinate of y axis
+	 * @return index
+	 */
 	private int getIndex (int x, int y) {
 		int index = y * width + x;
 		return index;
