@@ -4,7 +4,7 @@
 
 package ip_ws1718;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -16,6 +16,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
@@ -24,7 +25,7 @@ import javafx.stage.FileChooser;
 public class BinarizeViewController {
 
 	//private static final String initialFileName = "tools.png";
-	private static final String initialFileName = "tools.png";
+	private static String initialFileName = "tools.png";
 	private static File fileOpenPath = new File(".");
 
 	private int zoom = 1;
@@ -73,8 +74,13 @@ public class BinarizeViewController {
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images (*.jpg, *.png, *.gif)", "*.jpeg", "*.jpg", "*.png", "*.gif"));
 		File selectedFile = fileChooser.showOpenDialog(null);
 		if(selectedFile != null) {
+			initialFileName = selectedFile.getAbsolutePath();
 			fileOpenPath = selectedFile.getParentFile();
-			new RasterImage(selectedFile).setToView(binarizedImageView);
+
+			RasterImage image = new RasterImage(selectedFile);
+			Image img = new Image(new File(initialFileName).toURI().toString(), image.width, image.height, true, false);
+			binarizedImageView.setImage(img);
+
 			processImage();
 			messageLabel.getScene().getWindow().sizeToScene();
 		}
@@ -84,7 +90,6 @@ public class BinarizeViewController {
 	private void processImage() {
 		if(binarizedImageView.getImage() == null)
 			return; // no image: nothing to do
-
 
 		RasterImage origImg = new RasterImage(binarizedImageView); 
 		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
@@ -101,22 +106,25 @@ public class BinarizeViewController {
 
 	private void zoomChanged() {
 		messageLabel.setText(zoom + "");
-		double zoomedWidth = Math.ceil (zoom * imageWidth);
+		double zoomedWidth  = Math.ceil (zoom * imageWidth);
 		double zoomedHeight = Math.ceil (zoom * imageHeight);
+
+		Image img = new Image(new File(initialFileName).toURI().toString(), zoomedWidth, zoomedHeight, true, false);
+		binarizedImageView.setImage(img);
+
 		binarizedImageView.setFitWidth(zoomedWidth);
 		binarizedImageView.setFitHeight(zoomedHeight);
 		drawOverlay();
 	}
 
 	private void drawOverlay() {
-		double zoomedWidth = Math.ceil (zoom * imageWidth);
+		double zoomedWidth  = Math.ceil (zoom * imageWidth);
 		double zoomedHeight = Math.ceil (zoom * imageHeight);
 		canvas.setWidth(zoomedWidth);
 		canvas.setHeight(zoomedHeight);
 
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
-		gc.setStroke(Color.RED);
 		gc.setLineWidth(1);
 		for (Kontur region : regions) {
 			Color color = (region.getType() == Kontur.Contourtype.internal) ? Color.BLUE : Color.RED;
