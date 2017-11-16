@@ -3,6 +3,8 @@ package ip_ws1718;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import ip_ws1718.Kontur.Contourtype;
+
 public class Potracer {
 
 	static int SOUTH = 0;
@@ -23,6 +25,7 @@ public class Potracer {
 	public ArrayList<Kontur> scan () {
 		ArrayList<Kontur> paths = new ArrayList<Kontur>();
 		Kontur k;
+		RasterImage cimg = new RasterImage(img);	// Kopie
 
 		for (int y = 0; y < img.height; y++) {
 			for (int x = 0; x < img.width; x++) {
@@ -34,7 +37,8 @@ public class Potracer {
 				}
 			}
 		}
-
+		img = cimg;
+		findContourType(paths);
 		return paths;
 	}
 
@@ -85,6 +89,17 @@ public class Potracer {
 			int color = img.getPixel(x, row);
 			color = (color == 0xffffffff)? 0xff000000 : 0xffffffff;		// invert color
 			img.setPixel(x, row, color);
+		}
+	}
+	
+	private void findContourType(ArrayList<Kontur> list) {
+		for (Kontur cont : list) {
+			Point first = cont.getVertex(0);
+			if (isForegroundPixel(first)) {
+				cont.setType(Contourtype.external);
+			} else {
+				cont.setType(Contourtype.internal);
+			}
 		}
 	}
 
