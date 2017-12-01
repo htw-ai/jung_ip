@@ -77,6 +77,7 @@
                         <Rectangle2D minX="800.0" minY="600.0" />
                      </viewport>
                   </ImageView>
+                  <Canvas fx:id="canvas2" width="1" height="1" />
                   <Canvas fx:id="canvas" height="200.0" width="200.0" />
                </children>
             </StackPane>

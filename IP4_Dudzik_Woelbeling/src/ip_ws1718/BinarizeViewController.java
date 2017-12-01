@@ -19,8 +19,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
 import javafx.stage.FileChooser;
 
 public class BinarizeViewController {
@@ -39,6 +37,9 @@ public class BinarizeViewController {
 
 	@FXML
 	private Canvas canvas;
+	
+	@FXML
+	private Canvas canvas2;
 
 	@FXML
 	private ImageView binarizedImageView;
@@ -125,6 +126,7 @@ public class BinarizeViewController {
 		binarizedImageView.setFitWidth(zoomedWidth);
 		binarizedImageView.setFitHeight(zoomedHeight);
 		//drawRegion();
+		drawGrid();
 		drawPolygon();
 	}
 
@@ -175,9 +177,31 @@ public class BinarizeViewController {
 				gc.fillOval((((double) points.get(i).x) - 0.1) * zoom, (((double) points.get(i).y) - 0.1) * zoom, 0.2 * zoom, 0.2 * zoom);
 			}
 			gc.strokePolyline(xs,  ys, n);
-			
-
 		}
+	}
+	
+	private void drawGrid() {
+		double zoomedWidth  = Math.ceil (zoom * imageWidth);
+		double zoomedHeight = Math.ceil (zoom * imageHeight);
+		canvas2.setWidth(zoomedWidth);
+		canvas2.setHeight(zoomedHeight);
+		GraphicsContext gc2 = canvas2.getGraphicsContext2D();
+		gc2.clearRect(0, 0, zoomedWidth, zoomedHeight);
+
+		if (zoom >= 15) {
+			int gridPixelDistance = 1;
+			gc2.setLineWidth(1);
+			gc2.setLineDashes(2);
+			gc2.setStroke(Color.LIGHTGRAY);
+			double gritSpacing = zoom * gridPixelDistance;
+			for(double y = 0; y <= zoomedHeight; y += gritSpacing) {
+				gc2.strokeLine(0, y, zoomedWidth, y);
+			}
+			for(double x = 0; x <= zoomedWidth; x += gritSpacing) {
+				gc2.strokeLine(x, 0, x, zoomedHeight);
+			}
+		}
+		canvas.toFront();
 	}
 
 }
