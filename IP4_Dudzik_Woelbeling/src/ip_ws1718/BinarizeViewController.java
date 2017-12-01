@@ -31,6 +31,7 @@ public class BinarizeViewController {
 	private int imageWidth = 0;
 	private int imageHeight = 0;
 	ArrayList<Kontur> regions;
+	ArrayList<Kontur> polygons;
 
 	@FXML
 	private Slider slider;
@@ -104,7 +105,9 @@ public class BinarizeViewController {
 		binarizedImageView.setFitHeight(imageHeight);
 
 		regions = new Contourfinder(binImg).scan();
-		ArrayList<Path> p = Potracer.getPaths(regions);	//TODO
+		//ArrayList<Path> p = Potracer.getPaths(regions);	//TODO
+		polygons = Potracer.getPolygons(regions);
+		
 		drawOverlay();
 
 	}
