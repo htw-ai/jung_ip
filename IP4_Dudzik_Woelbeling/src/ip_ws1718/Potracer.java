@@ -7,7 +7,6 @@ package ip_ws1718;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 import ip_ws1718.Path.PathType;
 
@@ -121,7 +120,9 @@ public class Potracer {
 				Point vec = new Point(k.x - i.x, k.y - i.y);
 
 				//if constraint verletzt -> Abbruch
-				if (crossproduct(c0,vec) < 0 || crossproduct(c1,vec) < 0) break;	// see p. 11
+				int test0 = crossproduct(c0,vec);
+				int test1 = crossproduct(c1,vec);
+				if (crossproduct(c0,vec) < 0 || crossproduct(c1,vec) > 0) break;	// see p. 11
 
 				// update constraint
 				if (Math.abs(vec.x) > 1 || Math.abs(vec.y) > 1) {	// see p.12 (vec = a)
@@ -156,9 +157,11 @@ public class Potracer {
 			j = straightPaths[i-1] -1;
 			diff = (j < i) ? j - i + n : j - i;
 			//if (diff <= n - 3 && straightPaths[i] == j) {
-			if (diff <= n - 3) {
+			//if (diff <= n - 3) {
+			if (diff <= n - 3 && diff > 0) {
 				possible[i] = j;
 			} else {
+				possible[i] = -1;
 				System.out.println("Nö");
 			}
 		}
@@ -168,29 +171,40 @@ public class Potracer {
 	
 	private static Kontur getPolygon(Kontur region) {
 		Kontur polygon = new Kontur();
-		ArrayList<Point> points = region.getVertices();
 		int start = 0;
-		int from, to;
+		polygon = getPolygon(region, start);
 		
+		return polygon;
+	}
+	
+	private static Kontur getPolygon(Kontur region, int start) {
+		Kontur polygon = new Kontur();
+		ArrayList<Point> points = region.getVertices();		
 		int[] possibleSegments = getPossibleSegments(getStraightPaths(region));
-		from = start;
-		polygon.addVertex(points.get(from));
-		to = possibleSegments[from];
+		int to = start;
+		int from = start;
 		
-		while (!(to >= start && (from > to || from < start))){
-			polygon.addVertex(points.get(to));
-			from = to;
-			to = possibleSegments[from];
+		try {
+			while (!(to >= start && (from > to || from < start))){
+				polygon.addVertex(points.get(to));
+				from = to;
+				to = possibleSegments[from];
+				if (to == -1) 
+					throw new IndexOutOfBoundsException();
+			}
+			/*
+			 * Abbruch:
+			 * - from > to + to > start (start 0; from 3 und to 1)
+			 * - from > to + to = start (start 0; from 3 und to 0)
+			 * - from < start + to > start (start 2; from 1 und to 3)
+			 * - from < start + to = start (start 1; from 0 und to 1)
+			 */
+			polygon.addVertex(points.get(start));
+		} catch (IndexOutOfBoundsException e) {
+			start = (start + 1) % (points.size() - 1);
+			polygon = getPolygon(region, start);
 		}
-		/*
-		 * Abbruch:
-		 * - from > to + to > start (start 0; from 3 und to 1)
-		 * - from > to + to = start (start 0; from 3 und to 0)
-		 * - from < start + to > start (start 2; from 1 und to 3)
-		 * - from < start + to = start (start 1; from 0 und to 1)
-		 */
-		polygon.addVertex(points.get(start));
-		
+
 		return polygon;
 	}
 	

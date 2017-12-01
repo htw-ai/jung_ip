@@ -19,12 +19,13 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.stage.FileChooser;
 
 public class BinarizeViewController {
 
-	//private static final String initialFileName = "tools.png";
-	private static String initialFileName = "tools.png";
+	private static String initialFileName = "w2.png";
 	private static File fileOpenPath = new File(".");
 
 	private int zoom = 1;
@@ -108,7 +109,8 @@ public class BinarizeViewController {
 		//ArrayList<Path> p = Potracer.getPaths(regions);	//TODO
 		polygons = Potracer.getPolygons(regions);
 		
-		drawOverlay();
+		//drawRegion();
+		drawPolygon();
 
 	}
 
@@ -122,10 +124,11 @@ public class BinarizeViewController {
 
 		binarizedImageView.setFitWidth(zoomedWidth);
 		binarizedImageView.setFitHeight(zoomedHeight);
-		drawOverlay();
+		//drawRegion();
+		drawPolygon();
 	}
 
-	private void drawOverlay() {
+	private void drawRegion() {
 		double zoomedWidth  = Math.ceil (zoom * imageWidth);
 		double zoomedHeight = Math.ceil (zoom * imageHeight);
 		canvas.setWidth(zoomedWidth);
@@ -146,6 +149,34 @@ public class BinarizeViewController {
 				ys[i] = ((double) points.get(i).y) * zoom;
 			}
 			gc.strokePolygon(xs, ys, pointSize);
+		}
+	}
+	
+	private void drawPolygon() {
+		double zoomedWidth  = Math.ceil (zoom * imageWidth);
+		double zoomedHeight = Math.ceil (zoom * imageHeight);
+		canvas.setWidth(zoomedWidth);
+		canvas.setHeight(zoomedHeight);
+
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
+		gc.setLineWidth(2);
+		gc.setStroke(Color.BLUE);
+		gc.setFill(Color.BLUE);
+		for (Kontur polygon : polygons) {
+
+			ArrayList<Point> points = polygon.getVertices();
+			int n = points.size();
+			double[] xs = new double[n];
+			double[] ys = new double[n];
+			for (int i = 0; i < points.size(); i++) {
+				xs[i] = ((double) points.get(i).x) * zoom;
+				ys[i] = ((double) points.get(i).y) * zoom;
+				gc.fillOval((((double) points.get(i).x) - 0.1) * zoom, (((double) points.get(i).y) - 0.1) * zoom, 0.2 * zoom, 0.2 * zoom);
+			}
+			gc.strokePolyline(xs,  ys, n);
+			
+
 		}
 	}
 
