@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import ip_ws1718.Path.PathType;
+
 public class Potracer {
 	enum Direction {NORTH, SOUTH, WEST, EAST};
 
@@ -22,6 +24,7 @@ public class Potracer {
 		Point vec;
 		HashSet<Direction> dir;
 		int[] pivot;
+		ArrayList<Path> paths = new ArrayList<Path>();
 		
 		for (Kontur region: regions) {
 			// init
@@ -30,18 +33,21 @@ public class Potracer {
 			points = new Point[region.getVertices().size()];
 			region.getVertices().toArray(points);
 			pivot = new int[region.getVertices().size() - 1];	// one less, because start point = end point of contour
-
-			for (int start = 0; start < points.length - 1; start++) {	// caution: start point = end point in list!
-				Point i = points[start];
-				int indexk = (start == points.length - 2) ? 0 : start + 1;
-				Point k = points[indexk];
+		
+			for (int indexi = 0; indexi < points.length - 1; indexi++) {	// caution: start point = end point in list!
 				dir = new HashSet<Direction>();
-				dir.add(getDirection(i,k));
+				int hilf;
+				int indexk = indexi;
+				Point i = points[indexi];
 				
-				//while (dir.size() < 4) {
-				//while (k != i) {
-				while(dir.size() < 4 && k != i) {
-					//if (dir.size() == 4) break;	// Abbruch
+				do {
+					hilf = indexk;
+					indexk = (indexk == points.length - 2) ? 0 : indexk + 1;
+					Point k = points[indexk];
+					dir.add(getDirection(points[hilf], k));
+					
+					// falls mehr als 3 Richtungen -> Abbruch!
+					if (dir.size() > 3) break;
 					
 					// calculate vector from i to k
 					vec = new Point(k.x - i.x, k.y - i.y);
@@ -66,20 +72,18 @@ public class Potracer {
 					}
 					
 					// note
-					pivot[start] = indexk;
+					pivot[indexi] = indexk;
 					
-					// get next target point's index
-					indexk = (indexk == points.length - 2) ? 0: indexk + 1;
-					k = points[indexk];
-					dir.add(getDirection(i,k));
-				} 
+				} while(true);	// Endlosschleife
+				paths.add(new Path(i, points[pivot[indexi]], PathType.straight));
 			}
+				 
 		}
 		
-		return null;
+		return paths;
 	}
 	
-	private static Direction getDirection (Point a, Point b) {
+	private static Direction getDirection(Point a, Point b) {
 		if (a.x == b.x) {
 			if (a.y > b.y) {
 				return Direction.NORTH;
@@ -95,7 +99,7 @@ public class Potracer {
 		}
 	}
 
-	private static int crossproduct (Point a, Point b) {
+	private static int crossproduct(Point a, Point b) {
 		return a.x * b.y - a.y * b.x;
 	}
 }
