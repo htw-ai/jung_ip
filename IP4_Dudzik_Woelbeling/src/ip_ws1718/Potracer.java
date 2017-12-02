@@ -81,19 +81,17 @@ public class Potracer {
 		int[] possible = new int[n];
 		int j;
 		int diff  = 0;
-		for (int i = 1; i < n; i++) {
-			j = straightPaths[i-1] -1;
+		for (int i = 0; i < n; i++) {
+			j = (i > 0) ? straightPaths[i-1] -1 : straightPaths[n - 1] - 1;
 			if (j < 0) j += n;
 			diff = (j < i) ? j - i + n : j - i;
-			//if (diff <= n - 3 && straightPaths[i] == j) {
 			if (diff <= n - 3) {
 				possible[i] = j;
 			} else {
-				// TODO
+				// TODO: gibt es solche Fälle überhaupt?
 				System.out.println("ToDo!");
 			}
 		}
-		possible[0] = straightPaths[n - 1] - 1;	// TODO: auch prüfen?
 		return possible;
 	}
 	
@@ -109,7 +107,6 @@ public class Potracer {
 		int to = start;
 		int from = start;
 		
-		//try {
 			while (!(to >= start && (from > to || from < start))){	// TODO: lesbarer machen
 				polygon.addVertex(points.get(to));
 				from = to;
@@ -123,11 +120,6 @@ public class Potracer {
 			 * - from < start + to = start (start 1; from 0 und to 1)
 			 */
 			polygon.addVertex(points.get(start));
-		//} catch (ArrayIndexOutOfBoundsException e) {
-		//	System.out.println("Fehler: ");
-		//	System.out.println("Polyline: " + from + " -> " + to + " (start " + start + ")");
-		//	System.out.println("Konturlänge: " + points.size());
-		//}
 
 		return polygon;
 	}
