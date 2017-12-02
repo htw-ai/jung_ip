@@ -23,7 +23,7 @@ import javafx.stage.FileChooser;
 
 public class BinarizeViewController {
 
-	private static String initialFileName = "w2.png";
+	private static String initialFileName = "head.png";
 	private static File fileOpenPath = new File(".");
 
 	private int zoom = 1;
