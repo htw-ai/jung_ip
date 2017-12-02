@@ -73,12 +73,12 @@
             <StackPane>
                <children>
                   <ImageView fx:id="binarizedImageView" pickOnBounds="true" preserveRatio="true" smooth="false">
-                     <viewport>
-                        <Rectangle2D minX="800.0" minY="600.0" />
+	                  <viewport>
+	                        <Rectangle2D fx:id="screenBounds" />
                      </viewport>
                   </ImageView>
-                  <Canvas fx:id="canvas2" width="1" height="1" />
-                  <Canvas fx:id="canvas" height="200.0" width="200.0" />
+                  <Canvas fx:id="canvas2" />
+                  <Canvas fx:id="canvas" />
                </children>
             </StackPane>
          </content>

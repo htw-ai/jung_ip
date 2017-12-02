@@ -12,6 +12,7 @@ import ip_ws1718.RasterImage;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -20,11 +21,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 
 public class BinarizeViewController {
 
-	private static String initialFileName = "head.png";
+	private static final String initialFileName = "head.png";
 	private static File fileOpenPath = new File(".");
+	private static File loadedPicture = new File(initialFileName);
 
 	private int zoom = 1;
 	private int imageWidth = 0;
@@ -44,6 +47,8 @@ public class BinarizeViewController {
 	@FXML
 	private ImageView binarizedImageView;
 
+	@FXML
+	private Rectangle2D screenBounds;	// optimal window size
 
 	@FXML
 	private Label messageLabel;
@@ -58,19 +63,18 @@ public class BinarizeViewController {
 					Number old_val, Number new_val) {
 
 				zoom = new_val.intValue();
-				zoomChanged();
-
+				showImageZoomed();
 			}
 		});
+		
+		screenBounds = Screen.getPrimary().getVisualBounds();
 
 		// load and process default image
-		File loadedPicture = new File(initialFileName);
-		RasterImage image = new RasterImage(loadedPicture);
-		Image img = new Image(loadedPicture.toURI().toString(), image.width, image.height, true, false);
-		binarizedImageView.setImage(img);
+		loadedPicture = new File(initialFileName);
+		loadImage();
 
 		processImage();
-		messageLabel.setText(zoom + "");
+		showImageZoomed();
 	}
 
 	@FXML
@@ -80,52 +84,56 @@ public class BinarizeViewController {
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images (*.jpg, *.png, *.gif)", "*.jpeg", "*.jpg", "*.png", "*.gif"));
 		File selectedFile = fileChooser.showOpenDialog(null);
 		if(selectedFile != null) {
-			initialFileName = selectedFile.getAbsolutePath();
 			fileOpenPath = selectedFile.getParentFile();
-
-			File loadedPicture = new File(initialFileName);
-			RasterImage image = new RasterImage(loadedPicture);
-			Image img = new Image(loadedPicture.toURI().toString(), image.width, image.height, true, false);
-			binarizedImageView.setImage(img);
-			
+			loadedPicture = new File(selectedFile.getAbsolutePath());
+			loadImage();
 			processImage();
-			messageLabel.getScene().getWindow().sizeToScene();
+			showImageZoomed();
 		}
 	}
-
+	
+	private void showImageZoomed() {
+		RasterImage image = new RasterImage(loadedPicture);
+		double zoomedWidth  = Math.ceil (zoom * image.width);
+		double zoomedHeight = Math.ceil (zoom * image.height);
+		Image img = new Image(loadedPicture.toURI().toString(), zoomedWidth, zoomedHeight, true, false);
+		binarizedImageView.setImage(img);
+		binarizedImageView.setFitWidth(zoomedWidth);
+		binarizedImageView.setFitHeight(zoomedHeight);
+		slider.setValue(zoom);		// TODO: Zirkelbezug entfernen! (Eventlistener ruft diese Methode wieder auf)
+		messageLabel.setText(zoom + "");
+		
+		drawOverlays();
+	}
+	
+	private void loadImage() {
+		RasterImage image = new RasterImage(loadedPicture);
+		imageWidth = image.width;
+		imageHeight = image.height;
+		Image img = new Image(loadedPicture.toURI().toString(), imageWidth, imageHeight, true, false);
+		binarizedImageView.setImage(img);
+		
+		int optZoomX = (int) Math.floor(screenBounds.getWidth() * 0.8 / imageWidth);
+		int optZoomY = (int) Math.floor(screenBounds.getHeight() * 0.6 / imageHeight);
+		zoom = (optZoomX < optZoomY) ? optZoomX : optZoomY;
+		if (zoom > slider.getMax()) 
+			zoom = (int) slider.getMax();
+		if (zoom < slider.getMin())
+			zoom = (int) slider.getMin();
+	}
 
 	private void processImage() {
 		if(binarizedImageView.getImage() == null)
 			return; // no image: nothing to do
 
-		RasterImage origImg = new RasterImage(binarizedImageView); 
-		RasterImage binImg = new RasterImage(origImg); // create a clone of origImg
+		RasterImage origImg = new RasterImage(loadedPicture); 
 
-		imageWidth = origImg.width;
-		imageHeight = origImg.height;
-		binarizedImageView.setFitWidth(imageWidth);
-		binarizedImageView.setFitHeight(imageHeight);
-
-		regions = new Contourfinder(binImg).scan();
-		//ArrayList<Path> p = Potracer.getPaths(regions);	//TODO
+		regions = new Contourfinder(origImg).scan();
 		polygons = Potracer.getPolygons(regions);
-		
-		//drawRegion();
-		drawGrid();
-		drawPolygon();
 
 	}
-
-	private void zoomChanged() {
-		messageLabel.setText(zoom + "");
-		double zoomedWidth  = Math.ceil (zoom * imageWidth);
-		double zoomedHeight = Math.ceil (zoom * imageHeight);
-
-		Image img = new Image(new File(initialFileName).toURI().toString(), zoomedWidth, zoomedHeight, true, false);
-		binarizedImageView.setImage(img);
-
-		binarizedImageView.setFitWidth(zoomedWidth);
-		binarizedImageView.setFitHeight(zoomedHeight);
+	
+	private void drawOverlays() {
 		//drawRegion();
 		drawGrid();
 		drawPolygon();
