@@ -111,6 +111,7 @@ public class BinarizeViewController {
 		polygons = Potracer.getPolygons(regions);
 		
 		//drawRegion();
+		drawGrid();
 		drawPolygon();
 
 	}
