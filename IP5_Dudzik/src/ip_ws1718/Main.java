@@ -1,6 +1,6 @@
-// IP Ue4 WS2017/18 
+// IP Ue5 WS2017/18 
 //
-// Date: 2017-12-01
+// Date: 2017-12-10
 
 package ip_ws1718;
 	
@@ -17,7 +17,7 @@ public class Main extends Application {
 		BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("BinarizeView.fxml"));
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Potrace - Dudzik/Woelbeling");
+		primaryStage.setTitle("Potrace - Dudzik");
 		primaryStage.show();
 	}
 	
