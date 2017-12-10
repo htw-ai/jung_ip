@@ -1,4 +1,4 @@
-// IP Ue4 WS2017/18
+// IP Ue5 WS2017/18
 //
 // Date: 2017-12-01
 
@@ -80,7 +80,7 @@ public class Potracer {
 		int n = straightPaths.length;
 		int[] possible = new int[n];
 		int j;
-		int diff  = 0;
+		int diff;
 		for (int i = 0; i < n; i++) {
 			j = (i > 0) ? straightPaths[i-1] -1 : straightPaths[n - 1] - 1;
 			if (j < 0) j += n;
@@ -88,7 +88,7 @@ public class Potracer {
 			if (diff <= n - 3) {
 				possible[i] = j;
 			} else {
-				// TODO: gibt es solche Fälle überhaupt?
+				// TODO: gibt es solche Fï¿½lle ï¿½berhaupt?
 				System.out.println("ToDo!");
 			}
 		}
@@ -96,18 +96,55 @@ public class Potracer {
 	}
 	
 	private static Kontur getPolygon(Kontur region) {
-		int start = 0;
-		return getPolygon(region, start);
+		int size = region.getVertices().size() - 1;
+		Kontur k  = getPolygon(region, 0);
+		for (int i = 1; i<size; i++) {
+			Kontur k2 = getPolygon(region, i);
+			if (k2.getVertices().size() < k.getVertices().size()) {
+				k = k2;
+			}
+		}
+		return k;
 	}
-	
+
+	private static boolean firstToIsBreakingPoint(Kontur region, int start) {
+		Kontur polygon = new Kontur();
+		ArrayList<Point> points = region.getVertices();
+		int[] possibleSegments = getPossibleSegments(getStraightPaths(region));
+		int to = start;
+		int from = start;
+
+		polygon.addVertex(points.get(to));
+		from = to;
+		to = possibleSegments[from];
+
+		return to < from;
+	}
+
 	private static Kontur getPolygon(Kontur region, int start) {
 		Kontur polygon = new Kontur();
 		ArrayList<Point> points = region.getVertices();		
 		int[] possibleSegments = getPossibleSegments(getStraightPaths(region));
 		int to = start;
 		int from = start;
-		
-			while (!(to >= start && (from > to || from < start))){	// TODO: lesbarer machen
+
+		if (firstToIsBreakingPoint(region, start)) {
+			polygon.addVertex(points.get(to));
+			from = to;
+			to = possibleSegments[from];
+
+			polygon.addVertex(points.get(to));
+			from = to;
+			to = possibleSegments[from];
+
+			while (!(to < from)) {    // TODO: lesbarer machen
+				polygon.addVertex(points.get(to));
+				from = to;
+				to = possibleSegments[from];
+			}
+			polygon.addVertex(points.get(start));
+		} else {
+			while (!(to >= start && (from > to || from < start))) {    // TODO: lesbarer machen
 				polygon.addVertex(points.get(to));
 				from = to;
 				to = possibleSegments[from];
@@ -120,7 +157,7 @@ public class Potracer {
 			 * - from < start + to = start (start 1; from 0 und to 1)
 			 */
 			polygon.addVertex(points.get(start));
-
+		}
 		return polygon;
 	}
 	
