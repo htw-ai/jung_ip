@@ -130,7 +130,9 @@ public class BinarizeViewController {
 
 		regions = new Contourfinder(origImg).scan();
 		polygons = Potracer.getPolygons(regions);
-
+		int count = polygons.stream().map(polygon-> polygon.getVertices().size()-1)
+						 .reduce(0, (Integer a, Integer b) -> Integer.sum(a, b));
+		System.out.println(count);
 	}
 	
 	private void drawOverlays() {
