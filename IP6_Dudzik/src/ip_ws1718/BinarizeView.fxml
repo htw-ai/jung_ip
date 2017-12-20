@@ -55,7 +55,10 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <CheckBox fx:id="cbfill" mnemonicParsing="false" text="Fill" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="cbfill" mnemonicParsing="false" text="Fill" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets left="15.0" />
+                           </GridPane.margin></CheckBox>
                         <Slider fx:id="alphaslider" majorTickUnit="0.25" max="1.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Slider fx:id="factorslider" max="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <Label fx:id="alphaLabel" text="AlphaMin" GridPane.columnIndex="1" />

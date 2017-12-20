@@ -4,9 +4,9 @@
 
 package ip_ws1718;
 
-import java.awt.Checkbox;
 import java.awt.Point;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import ip_ws1718.RasterImage;
@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
@@ -29,6 +30,7 @@ public class BinarizeViewController {
 	private static final String initialFileName = "head.png";
 	private static File fileOpenPath = new File(".");
 	private static File loadedPicture = new File(initialFileName);
+	private static DecimalFormat format = new DecimalFormat("0.0");
 
 	private int zoom = 1;
 	private int imageWidth = 0;
@@ -76,7 +78,7 @@ public class BinarizeViewController {
 	private Label maxLabel;
 	
 	@FXML
-	private Checkbox cbfill;
+	private CheckBox cbfill;
 
 	@FXML
 	public void initialize() {
@@ -119,7 +121,6 @@ public class BinarizeViewController {
 					}
 				});
 		
-		
 		screenBounds = Screen.getPrimary().getVisualBounds();
 
 		// load and process default image
@@ -158,9 +159,9 @@ public class BinarizeViewController {
 		maxslider.setValue(max);
 		factorslider.setValue(factor);
 		messageLabel.setText("Zoom: " + zoom);
-		alphaLabel.setText("Alpha: " + minalpha);		// TODO: Zahl formatieren
-		factorLabel.setText("Factor: " + factor);
-		maxLabel.setText("Max Value: " + max);
+		alphaLabel.setText("Alpha: " + format.format(new Double(minalpha)));
+		factorLabel.setText("Factor: " + format.format(new Double(factor)));
+		maxLabel.setText("Max Value: " + format.format(new Double(max)));
 		
 		drawOverlays();
 	}
@@ -212,7 +213,7 @@ public class BinarizeViewController {
 		gc.setStroke(Color.BLUE);
 		gc.setFill(Color.BLUE);
 		
-		if (cbfill.getState()) {
+		if (cbfill.isSelected()) {
 			// TODO!!!
 			// Polygon füllen mit fillPolygon(xs,  ys, n);
 		}
