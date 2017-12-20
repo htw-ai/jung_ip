@@ -4,6 +4,7 @@
 
 package ip_ws1718;
 
+import java.awt.Checkbox;
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
@@ -32,11 +33,23 @@ public class BinarizeViewController {
 	private int zoom = 1;
 	private int imageWidth = 0;
 	private int imageHeight = 0;
+	private double minalpha = 0.5;
+	private double factor = 0.5;
+	private double max = 0.5;
 	ArrayList<Kontur> regions;
 	ArrayList<Kontur> polygons;
 
 	@FXML
 	private Slider slider;
+	
+	@FXML
+	private Slider alphaslider;
+	
+	@FXML
+	private Slider factorslider;
+	
+	@FXML
+	private Slider maxslider;
 
 	@FXML
 	private Canvas canvas;
@@ -52,6 +65,18 @@ public class BinarizeViewController {
 
 	@FXML
 	private Label messageLabel;
+	
+	@FXML
+	private Label alphaLabel;
+	
+	@FXML
+	private Label factorLabel;
+	
+	@FXML
+	private Label maxLabel;
+	
+	@FXML
+	private Checkbox cbfill;
 
 	@FXML
 	public void initialize() {
@@ -66,6 +91,34 @@ public class BinarizeViewController {
 				showImageZoomed();
 			}
 		});
+				alphaslider.valueProperty().addListener(new ChangeListener<Number>() {
+					@Override
+					public void changed(ObservableValue<? extends Number> ov,
+							Number old_val, Number new_val) {
+						minalpha = new_val.doubleValue();
+						processImage(); // TODO
+						showImageZoomed();
+					}
+				});
+				factorslider.valueProperty().addListener(new ChangeListener<Number>() {
+					@Override
+					public void changed(ObservableValue<? extends Number> ov,
+							Number old_val, Number new_val) {
+						factor = new_val.doubleValue();
+						processImage(); // TODO
+						showImageZoomed();
+					}
+				});
+				maxslider.valueProperty().addListener(new ChangeListener<Number>() {
+					@Override
+					public void changed(ObservableValue<? extends Number> ov,
+							Number old_val, Number new_val) {
+						max = new_val.doubleValue();
+						processImage(); // TODO
+						showImageZoomed();
+					}
+				});
+		
 		
 		screenBounds = Screen.getPrimary().getVisualBounds();
 
@@ -100,8 +153,14 @@ public class BinarizeViewController {
 		binarizedImageView.setImage(img);
 		binarizedImageView.setFitWidth(zoomedWidth);
 		binarizedImageView.setFitHeight(zoomedHeight);
-		slider.setValue(zoom);		// TODO: Zirkelbezug entfernen! (Eventlistener ruft diese Methode wieder auf)
-		messageLabel.setText(zoom + "");
+		slider.setValue(zoom);
+		alphaslider.setValue(minalpha);
+		maxslider.setValue(max);
+		factorslider.setValue(factor);
+		messageLabel.setText("Zoom: " + zoom);
+		alphaLabel.setText("Alpha: " + minalpha);		// TODO: Zahl formatieren
+		factorLabel.setText("Factor: " + factor);
+		maxLabel.setText("Max Value: " + max);
 		
 		drawOverlays();
 	}
@@ -140,30 +199,6 @@ public class BinarizeViewController {
 		drawGrid();
 		drawPolygon();
 	}
-
-	private void drawRegion() {
-		double zoomedWidth  = Math.ceil (zoom * imageWidth);
-		double zoomedHeight = Math.ceil (zoom * imageHeight);
-		canvas.setWidth(zoomedWidth);
-		canvas.setHeight(zoomedHeight);
-
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
-		gc.setLineWidth(1);
-		for (Kontur region : regions) {
-			Color color = (region.getType() == Kontur.Contourtype.internal) ? Color.BLUE : Color.RED;
-			gc.setStroke(color);
-			ArrayList<Point> points = region.getVertices();
-			int pointSize = points.size() -1;
-			double[] xs = new double[pointSize];
-			double[] ys = new double[pointSize];
-			for (int i = 0; i < pointSize; i++) {
-				xs[i] = ((double) points.get(i).x) * zoom;
-				ys[i] = ((double) points.get(i).y) * zoom;
-			}
-			gc.strokePolygon(xs, ys, pointSize);
-		}
-	}
 	
 	private void drawPolygon() {
 		double zoomedWidth  = Math.ceil (zoom * imageWidth);
@@ -176,6 +211,12 @@ public class BinarizeViewController {
 		gc.setLineWidth(2);
 		gc.setStroke(Color.BLUE);
 		gc.setFill(Color.BLUE);
+		
+		if (cbfill.getState()) {
+			// TODO!!!
+			// Polygon füllen mit fillPolygon(xs,  ys, n);
+		}
+		
 		for (Kontur polygon : polygons) {
 
 			ArrayList<Point> points = polygon.getVertices();
