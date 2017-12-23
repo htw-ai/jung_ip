@@ -104,6 +104,7 @@ public class Potracer {
 				k = k2;
 			}
 		}
+		k.setType(region.getType());
 		return k;
 	}
 

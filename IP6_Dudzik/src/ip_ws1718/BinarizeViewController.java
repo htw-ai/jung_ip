@@ -93,34 +93,44 @@ public class BinarizeViewController {
 				showImageZoomed();
 			}
 		});
-				alphaslider.valueProperty().addListener(new ChangeListener<Number>() {
-					@Override
-					public void changed(ObservableValue<? extends Number> ov,
-							Number old_val, Number new_val) {
-						minalpha = new_val.doubleValue();
-						processImage(); // TODO
-						showImageZoomed();
-					}
-				});
-				factorslider.valueProperty().addListener(new ChangeListener<Number>() {
-					@Override
-					public void changed(ObservableValue<? extends Number> ov,
-							Number old_val, Number new_val) {
-						factor = new_val.doubleValue();
-						processImage(); // TODO
-						showImageZoomed();
-					}
-				});
-				maxslider.valueProperty().addListener(new ChangeListener<Number>() {
-					@Override
-					public void changed(ObservableValue<? extends Number> ov,
-							Number old_val, Number new_val) {
-						max = new_val.doubleValue();
-						processImage(); // TODO
-						showImageZoomed();
-					}
-				});
-		
+
+		cbfill.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> ov,
+								Boolean old_val, Boolean new_val) {
+				processImage(); // TODO
+				showImageZoomed();
+			}
+		});
+
+		alphaslider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov,
+					Number old_val, Number new_val) {
+				minalpha = new_val.doubleValue();
+				processImage(); // TODO
+				showImageZoomed();
+			}
+		});
+		factorslider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov,
+					Number old_val, Number new_val) {
+				factor = new_val.doubleValue();
+				processImage(); // TODO
+				showImageZoomed();
+			}
+		});
+		maxslider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov,
+					Number old_val, Number new_val) {
+				max = new_val.doubleValue();
+				processImage(); // TODO
+				showImageZoomed();
+			}
+		});
+
 		screenBounds = Screen.getPrimary().getVisualBounds();
 
 		// load and process default image
@@ -190,9 +200,9 @@ public class BinarizeViewController {
 
 		regions = new Contourfinder(origImg).scan();
 		polygons = Potracer.getPolygons(regions);
-		int count = polygons.stream().map(polygon-> polygon.getVertices().size()-1)
-						 .reduce(0, (Integer a, Integer b) -> Integer.sum(a, b));
-		System.out.println(count);
+		// int count = polygons.stream().map(polygon-> polygon.getVertices().size()-1)
+		//				 .reduce(0, (Integer a, Integer b) -> Integer.sum(a, b));
+		// System.out.println(count);
 	}
 	
 	private void drawOverlays() {
@@ -200,7 +210,93 @@ public class BinarizeViewController {
 		drawGrid();
 		drawPolygon();
 	}
-	
+
+	class PPoint {
+		double x;
+		double y;
+		double zoom = 1;
+
+		PPoint (double x, double y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		PPoint (Point p) {
+			this.x = (double) p.x;
+			this.y = (double) p.y;
+		}
+
+		PPoint middle (PPoint point) {
+			double x = (this.x + point.x)/2;
+			double y = (this.y + point.y)/2;
+			return new PPoint(x, y);
+		}
+
+		PPoint zoom (int zoom) {
+			double x = this.x * zoom;
+			double y = this.y * zoom;
+			double nZoom = this.zoom * zoom;
+			PPoint p = new PPoint(x, y);
+			p.zoom = nZoom;
+			return p;
+		}
+
+		double distance (PPoint p) {
+			return Math.hypot(this.x-p.x, this.y-p.y);
+		}
+
+		PPoint subtract (PPoint p) {
+			double x = this.x - p.x;
+			double y = this.y - p.y;
+			return new PPoint(x, y);
+		}
+
+		PPoint normalize () {
+			double x = this.x;
+			double y = this.y;
+			double v = Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
+			x = x/v;
+			y = y/v;
+			return new PPoint(x, y);
+		}
+
+		PPoint multiply (double p) {
+			double x = this.x * p;
+			double y = this.y * p;
+			return new PPoint(x, y);
+		}
+
+		PPoint anteil (PPoint p, double alpha) {
+			PPoint unit = this.subtract(p).normalize().multiply(alpha);
+			p.subtract(unit);
+			return new PPoint(p.x, p.y);
+		}
+	}
+
+	class Triangle {
+
+		PPoint a;
+		PPoint b;
+		PPoint c;
+
+		Triangle (PPoint a, PPoint b, PPoint c) {
+			this.a = a;
+			this.b = b;
+			this.c = c;
+		}
+
+		double area() {
+			double foo = a.x *(b.y - c.y) + b.x*(c.y - a.y) + c.x * (a.y - b.y);
+			return 0.5 * Math.abs(foo);
+		}
+
+		double height () {
+			double a = area();
+			double d = this.a.distance(c);
+			return a / d;
+		}
+	}
+
 	private void drawPolygon() {
 		double zoomedWidth  = Math.ceil (zoom * imageWidth);
 		double zoomedHeight = Math.ceil (zoom * imageHeight);
@@ -213,23 +309,46 @@ public class BinarizeViewController {
 		gc.setStroke(Color.BLUE);
 		gc.setFill(Color.BLUE);
 		
-		if (cbfill.isSelected()) {
-			// TODO!!!
-			// Polygon füllen mit fillPolygon(xs,  ys, n);
-		}
-		
 		for (Kontur polygon : polygons) {
-
 			ArrayList<Point> points = polygon.getVertices();
 			int n = points.size();
-			double[] xs = new double[n];
-			double[] ys = new double[n];
-			for (int i = 0; i < points.size(); i++) {
-				xs[i] = ((double) points.get(i).x) * zoom;
-				ys[i] = ((double) points.get(i).y) * zoom;
-				gc.fillOval((((double) points.get(i).x) - 0.1) * zoom, (((double) points.get(i).y) - 0.1) * zoom, 0.2 * zoom, 0.2 * zoom);
+			if (polygon.getType().compareTo(Kontur.Contourtype.internal) == 0)
+				gc.setFill(Color.BLUE);
+			else
+				gc.setFill(Color.RED);
+
+			gc.beginPath();
+			for (int i = 0; i < n; i++) {
+
+				PPoint a = (i == 0) ? new PPoint(points.get(n-2)) : new PPoint(points.get(i-1));
+				PPoint b = new PPoint(points.get(i));
+				PPoint c = (i == n-1) ? new PPoint(points.get(0)) : new PPoint(points.get(i + 1));
+
+
+					PPoint startPoint = b.middle(a);
+					PPoint endPoint = b.middle(c);
+
+					//Triangle t = new Triangle(startPoint, b, endPoint);
+					//double height = t.height();
+
+					//double alpha1 = factor * ((height - 0.5) / height);
+					//double alpha2 = (alpha1 > max) ? max : alpha1;
+					//double alpha = (alpha2 < minalpha) ? minalpha : alpha2;
+
+					PPoint controlPoint1 = b;//.anteil(startPoint, alpha);
+					PPoint controlPoint2 = b;//.anteil(endPoint, alpha);
+
+					gc.moveTo(startPoint.x * zoom, startPoint.y * zoom);
+					gc.bezierCurveTo(controlPoint1.x * zoom, controlPoint1.y * zoom,
+									 controlPoint2.x * zoom, controlPoint2.y * zoom,
+							         endPoint.x * zoom, endPoint.y * zoom);
+
 			}
-			gc.strokePolyline(xs,  ys, n);
+			gc.closePath();
+			if (cbfill.isSelected())
+				gc.stroke();
+			else
+				gc.fill();
 		}
 	}
 	
