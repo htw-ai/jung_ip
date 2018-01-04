@@ -59,12 +59,12 @@
                            <GridPane.margin>
                               <Insets left="15.0" />
                            </GridPane.margin></CheckBox>
-                        <Slider fx:id="alphaslider" majorTickUnit="0.25" max="1.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Slider fx:id="alphaslider" majorTickUnit="0.25" max="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Slider fx:id="factorslider" max="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <Label fx:id="alphaLabel" text="AlphaMin" GridPane.columnIndex="1" />
                         <Label fx:id="factorLabel" text="Factor" GridPane.columnIndex="2" />
-                        <Slider fx:id="maxslider" max="1.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <Label fx:id="maxLabel" text="Max" GridPane.columnIndex="3" />
+                        <Slider fx:id="maxslider" max="5.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <Label fx:id="maxLabel" text="AlphaMax" GridPane.columnIndex="3" />
                      </children>
                      <GridPane.margin>
                         <Insets />

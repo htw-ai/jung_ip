@@ -27,7 +27,7 @@ import javafx.stage.Screen;
 
 public class BinarizeViewController {
 
-	private static final String initialFileName = "head.png";
+	private static final String initialFileName = "w2.png";
 	private static File fileOpenPath = new File(".");
 	private static File loadedPicture = new File(initialFileName);
 	private static DecimalFormat format = new DecimalFormat("0.0");
@@ -241,59 +241,45 @@ public class BinarizeViewController {
 			return p;
 		}
 
-		double distance (PPoint p) {
-			return Math.hypot(this.x-p.x, this.y-p.y);
-		}
-
 		PPoint subtract (PPoint p) {
 			double x = this.x - p.x;
 			double y = this.y - p.y;
 			return new PPoint(x, y);
 		}
 
-		PPoint normalize () {
-			double x = this.x;
-			double y = this.y;
-			double v = Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
-			x = x/v;
-			y = y/v;
-			return new PPoint(x, y);
-		}
-
-		PPoint multiply (double p) {
-			double x = this.x * p;
-			double y = this.y * p;
-			return new PPoint(x, y);
-		}
-
 		PPoint anteil (PPoint p, double alpha) {
-			PPoint unit = this.subtract(p).normalize().multiply(alpha);
-			p.subtract(unit);
-			return new PPoint(p.x, p.y);
-		}
-	}
+			double x = alpha * this.x + (1-alpha) * p.x;
+			double y = alpha * this.y + (1-alpha) * p.y;
 
-	class Triangle {
-
-		PPoint a;
-		PPoint b;
-		PPoint c;
-
-		Triangle (PPoint a, PPoint b, PPoint c) {
-			this.a = a;
-			this.b = b;
-			this.c = c;
+			return new PPoint(x, y);
 		}
 
-		double area() {
-			double foo = a.x *(b.y - c.y) + b.x*(c.y - a.y) + c.x * (a.y - b.y);
-			return 0.5 * Math.abs(foo);
+		double distance (PPoint start, PPoint end) {
+			PPoint aa = start;
+			PPoint bb = end;
+			PPoint v = this;
+
+			double x = bb.x-aa.x;
+			double y = -1 * (bb.x-aa.x);
+
+			double sx = x/Math.abs(x);
+			double sy = y/Math.abs(y);
+
+			if (Double.isNaN(sx)) {
+    			sx = x;
+			}
+			if (Double.isNaN(sy)) {
+    			sy = y;
+			}
+
+			PPoint s = new PPoint(sx, sy);
+			PPoint va = v.subtract(aa);
+
+			return s.scalar(va);
 		}
 
-		double height () {
-			double a = area();
-			double d = this.a.distance(c);
-			return a / d;
+		double scalar (PPoint p) {
+			return this.x * p.x + this.y * p.y;
 		}
 	}
 
@@ -319,36 +305,48 @@ public class BinarizeViewController {
 
 			gc.beginPath();
 			for (int i = 0; i < n; i++) {
+if (i==9) {
+				}
 
-				PPoint a = (i == 0) ? new PPoint(points.get(n-2)) : new PPoint(points.get(i-1));
+				PPoint a = (i == 0) ? new PPoint(points.get(n-1)) : new PPoint(points.get(i-1));
 				PPoint b = new PPoint(points.get(i));
 				PPoint c = (i == n-1) ? new PPoint(points.get(0)) : new PPoint(points.get(i + 1));
 
+				PPoint startPoint = b.middle(a);
+				PPoint endPoint = b.middle(c);
 
-					PPoint startPoint = b.middle(a);
-					PPoint endPoint = b.middle(c);
+				double distance = b.distance(startPoint, endPoint);
 
-					//Triangle t = new Triangle(startPoint, b, endPoint);
-					//double height = t.height();
+				double alpha1 = factor * ((distance - 0.5) / distance);
+				double alpha2 = (alpha1 < minalpha) ? minalpha : alpha1;
+				double alpha = (alpha2 > max) ? max : alpha2;
 
-					//double alpha1 = factor * ((height - 0.5) / height);
-					//double alpha2 = (alpha1 > max) ? max : alpha1;
-					//double alpha = (alpha2 < minalpha) ? minalpha : alpha2;
+				PPoint controlPoint1 = b.anteil(startPoint, alpha);
+				PPoint controlPoint2 = b.anteil(endPoint, alpha);
 
-					PPoint controlPoint1 = b;//.anteil(startPoint, alpha);
-					PPoint controlPoint2 = b;//.anteil(endPoint, alpha);
+				gc.setFill(Color.PALEGREEN);
+				gc.fillOval(controlPoint1.x * zoom,controlPoint1.y * zoom,5,5);
+				gc.setFill(Color.VIOLET);
+				gc.fillOval(controlPoint2.x * zoom,controlPoint2.y * zoom,5,5);
+				gc.setFill(Color.RED);
+				gc.fillOval(startPoint.x * zoom,startPoint.y * zoom,5,5);
+				gc.setFill(Color.BLUE);
+				gc.fillOval(b.x * zoom,b.y * zoom,5,5);
 
-					gc.moveTo(startPoint.x * zoom, startPoint.y * zoom);
-					gc.bezierCurveTo(controlPoint1.x * zoom, controlPoint1.y * zoom,
-									 controlPoint2.x * zoom, controlPoint2.y * zoom,
-							         endPoint.x * zoom, endPoint.y * zoom);
+				//controlPoint1 = b;
+				//controlPoint2 = b;
+
+				gc.moveTo(startPoint.x * zoom, startPoint.y * zoom);
+				gc.bezierCurveTo(controlPoint1.x * zoom, controlPoint1.y * zoom,
+								 controlPoint2.x * zoom, controlPoint2.y * zoom,
+								 endPoint.x * zoom, endPoint.y * zoom);
 
 			}
 			gc.closePath();
 			if (cbfill.isSelected())
-				gc.stroke();
-			else
 				gc.fill();
+			else
+				gc.stroke();
 		}
 	}
 	
