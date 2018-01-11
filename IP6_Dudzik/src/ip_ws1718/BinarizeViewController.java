@@ -35,9 +35,9 @@ public class BinarizeViewController {
 	private int zoom = 1;
 	private int imageWidth = 0;
 	private int imageHeight = 0;
-	private double minalpha = 0.5;
-	private double factor = 0.5;
-	private double max = 0.5;
+	private double minalpha = 0.0;
+	private double factor = 0.3;
+	private double max = 1.0;
 	ArrayList<Kontur> regions;
 	ArrayList<Kontur> polygons;
 
@@ -283,6 +283,11 @@ public class BinarizeViewController {
 		}
 	}
 
+	private int mod(int x, int y) {
+		int result = x % y;
+		return result < 0? result + y : result;
+	}
+
 	private void drawPolygon() {
 		double zoomedWidth  = Math.ceil (zoom * imageWidth);
 		double zoomedHeight = Math.ceil (zoom * imageHeight);
@@ -305,25 +310,19 @@ public class BinarizeViewController {
 
 			gc.beginPath();
 			for (int i = 0; i < n; i++) {
-if (i==9) {
-				}
-
-				PPoint a = (i == 0) ? new PPoint(points.get(n-1)) : new PPoint(points.get(i-1));
-				PPoint b = new PPoint(points.get(i));
-				PPoint c = (i == n-1) ? new PPoint(points.get(0)) : new PPoint(points.get(i + 1));
+				PPoint a = new PPoint(points.get(mod((i-1),   (n-1))));
+				PPoint b = new PPoint(points.get(mod( i,      (n-1))));
+				PPoint c = new PPoint(points.get(mod((i + 1), (n-1))));
 
 				PPoint startPoint = b.middle(a);
-				PPoint endPoint = b.middle(c);
+				PPoint endPoint   = b.middle(c);
 
 				double distance = b.distance(startPoint, endPoint);
 
 				double alpha1 = factor * ((distance - 0.5) / distance);
-				double alpha2 = (alpha1 < minalpha) ? minalpha : alpha1;
-				double alpha = (alpha2 > max) ? max : alpha2;
+				double alpha = (alpha1 < minalpha) ? minalpha : alpha1;
 
-				PPoint controlPoint1 = b.anteil(startPoint, alpha);
-				PPoint controlPoint2 = b.anteil(endPoint, alpha);
-
+				/*
 				gc.setFill(Color.PALEGREEN);
 				gc.fillOval(controlPoint1.x * zoom,controlPoint1.y * zoom,5,5);
 				gc.setFill(Color.VIOLET);
@@ -332,15 +331,25 @@ if (i==9) {
 				gc.fillOval(startPoint.x * zoom,startPoint.y * zoom,5,5);
 				gc.setFill(Color.BLUE);
 				gc.fillOval(b.x * zoom,b.y * zoom,5,5);
+				*/
 
-				//controlPoint1 = b;
-				//controlPoint2 = b;
-
-				gc.moveTo(startPoint.x * zoom, startPoint.y * zoom);
-				gc.bezierCurveTo(controlPoint1.x * zoom, controlPoint1.y * zoom,
-								 controlPoint2.x * zoom, controlPoint2.y * zoom,
-								 endPoint.x * zoom, endPoint.y * zoom);
-
+				if (i == 0) {
+					gc.moveTo(startPoint.x * zoom, startPoint.y * zoom);
+				}
+				if (alpha > max) {
+					gc.lineTo(b.x * zoom, b.y * zoom);
+					gc.lineTo(endPoint.x * zoom, endPoint.y * zoom);
+				} else {
+					PPoint controlPoint1 = b.anteil(startPoint, alpha);
+					PPoint controlPoint2 = b.anteil(endPoint, alpha);
+					
+					gc.bezierCurveTo(controlPoint1.x * zoom, controlPoint1.y * zoom,
+							controlPoint2.x * zoom, controlPoint2.y * zoom,
+							endPoint.x * zoom, endPoint.y * zoom);
+				}
+				if (i == n-1) {
+					gc.moveTo(endPoint.x * zoom, endPoint.y * zoom);
+				}
 			}
 			gc.closePath();
 			if (cbfill.isSelected())
