@@ -279,7 +279,7 @@ public class BinarizeViewController {
 		}
 
 		double scalar (PPoint p) {
-			return this.x * p.x + this.y * p.y;
+			return Math.abs(this.x * p.x + this.y * p.y);
 		}
 	}
 
